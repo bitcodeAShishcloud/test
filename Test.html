@@ -725,136 +725,203 @@
         }
 
         // Upload Handler
-        async function handleUpload(e) {
-            e.preventDefault();
-            
-            console.log('📤 Upload started');
-            
-            const statusDiv = document.getElementById('status');
-            statusDiv.className = 'status info show';
-            statusDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+         async function handleUpload(e) {
+    e.preventDefault();
+    
+    console.log('📤 Upload started');
+    
+    const statusDiv = document.getElementById('status');
+    statusDiv.className = 'status info show';
+    statusDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
 
-            try {
-                // Check authentication first
-                const token = gapi.client.getToken();
-                if (!token || !token.access_token) {
-                    throw new Error('Not authenticated. Please sign in first.');
-                }
-
-                const pName = document.getElementById('pName').value.trim();
-                const subject = document.getElementById('selectedSubject').value || document.getElementById('subjectInput').value.trim();
-                const fileInput = document.getElementById('fileInput');
-                const file = fileInput.files[0];
-                const folderId = localStorage.getItem('driveFolderId');
-
-                // Validation
-                if (!pName) {
-                    throw new Error('Please enter your name');
-                }
-                if (!subject) {
-                    throw new Error('Please create or select a subject');
-                }
-                if (!folderId) {
-                    throw new Error('Please set Drive Folder ID in Settings ⚙️');
-                }
-                if (!file) {
-                    throw new Error('Please select a file');
-                }
-
-                console.log('📝 Upload details:', { pName, subject, fileName: file.name, folderId });
-
-                // Save name for next time
-                localStorage.setItem('userName', pName);
-
-                // Find or create subject folder
-                statusDiv.innerHTML = '<i class="fas fa-folder"></i> Checking folder...';
-                
-                const listResponse = await gapi.client.drive.files.list({
-                    q: `'${folderId}' in parents and name='${subject}' and mimeType='application/vnd.google-apps.folder' and trashed=false`,
-                    fields: 'files(id, name)',
-                    spaces: 'drive'
-                });
-
-                console.log('📂 Folder list response:', listResponse);
-
-                let targetFolderId = folderId;
-                const files = listResponse.result?.files || [];
-
-                if (files.length > 0) {
-                    targetFolderId = files[0].id;
-                    console.log('✅ Found existing folder:', targetFolderId);
-                } else {
-                    statusDiv.innerHTML = '<i class="fas fa-plus-circle"></i> Creating folder...';
-                    const createResponse = await gapi.client.drive.files.create({
-                        resource: {
-                            name: subject,
-                            mimeType: 'application/vnd.google-apps.folder',
-                            parents: [folderId]
-                        },
-                        fields: 'id'
-                    });
-                    targetFolderId = createResponse.result.id;
-                    console.log('✅ Created new folder:', targetFolderId);
-                }
-
-                // Upload file
-                statusDiv.innerHTML = '<i class="fas fa-upload"></i> Uploading file...';
-                
-                const accessToken = token.access_token;
-                const form = new FormData();
-                
-                const metadata = {
-                    name: `${pName}_${file.name}`,
-                    parents: [targetFolderId]
-                };
-
-                form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-                form.append('file', file);
-
-                const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-                    method: 'POST',
-                    headers: { 
-                        'Authorization': 'Bearer ' + accessToken,
-                        'Content-Type': 'multipart/related'
-                    },
-                    body: form
-                });
-
-                console.log('📊 Upload response status:', response.status);
-
-                const result = await response.json();
-                console.log('📊 Upload result:', result);
-
-                if (response.ok && result.id) {
-                    // Save upload record
-                    saveUploadRecord(pName, subject, file.name);
-                    
-                    statusDiv.className = 'status success show';
-                    statusDiv.innerHTML = `
-                        <i class="fas fa-check-circle"></i> 
-                        <strong>Success!</strong><br>
-                        File uploaded to "${subject}" folder
-                    `;
-                    
-                    // Reset form but keep subjects
-                    document.getElementById('fileInput').value = '';
-                    document.getElementById('fileInfo').classList.remove('show');
-                    document.getElementById('subjectInput').value = '';
-                    document.getElementById('selectedSubject').value = '';
-                    document.querySelectorAll('.subject-tag').forEach(t => t.classList.remove('active'));
-                    
-                    updateStats();
-                } else {
-                    const errorMsg = result.error?.message || result.error?.errors?.[0]?.message || 'Upload failed';
-                    throw new Error(errorMsg);
-                }
-
-            } catch (err) {
-                console.error('❌ Upload error:', err);
-                statusDiv.className = 'status error show';
-                statusDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> Error: ${err.message || 'Unknown error'}`;
-            }
+    try {
+        // Step 1: Check authentication
+        console.log('🔐 Checking authentication...');
+        const token = gapi.client.getToken();
+        
+        if (!token) {
+            throw new Error('Not logged in. Please sign in first.');
         }
+        
+        if (!token.access_token) {
+            throw new Error('Authentication token missing. Please sign in again.');
+        }
+
+        // Step 2: Get form values
+        console.log('📝 Getting form values...');
+        const pName = document.getElementById('pName').value.trim();
+        const selectedSubject = document.getElementById('selectedSubject').value.trim();
+        const manualSubject = document.getElementById('subjectInput').value.trim();
+        const subject = selectedSubject || manualSubject;
+        const fileInput = document.getElementById('fileInput');
+        const file = fileInput.files[0];
+        const folderId = localStorage.getItem('driveFolderId');
+
+        // Step 3: Validation
+        console.log('🔍 Validating inputs...');
+        if (!pName) {
+            throw new Error('Please enter your name');
+        }
+        if (!subject) {
+            throw new Error('Please create or select a subject');
+        }
+        if (!folderId) {
+            throw new Error('Please set Drive Folder ID in Settings ⚙️');
+        }
+        if (!file) {
+            throw new Error('Please select a file');
+        }
+
+        console.log('✅ Validation passed:', { pName, subject, fileName: file.name });
+
+        // Save name for next time
+        localStorage.setItem('userName', pName);
+
+        // Step 4: Find or create subject folder
+        statusDiv.innerHTML = '<i class="fas fa-folder"></i> Checking folder...';
+        console.log('📂 Looking for folder:', subject);
+        
+        try {
+            const listResponse = await gapi.client.drive.files.list({
+                q: `'${folderId}' in parents and name='${subject}' and mimeType='application/vnd.google-apps.folder' and trashed=false`,
+                fields: 'files(id, name)',
+                spaces: 'drive'
+            });
+
+            console.log('📂 Folder list response:', listResponse);
+
+            let targetFolderId = folderId;
+            const files = listResponse.result?.files || [];
+
+            if (files.length > 0) {
+                targetFolderId = files[0].id;
+                console.log('✅ Found existing folder:', targetFolderId);
+            } else {
+                statusDiv.innerHTML = '<i class="fas fa-plus-circle"></i> Creating folder...';
+                console.log('📁 Creating new folder:', subject);
+                
+                const createResponse = await gapi.client.drive.files.create({
+                    resource: {
+                        name: subject,
+                        mimeType: 'application/vnd.google-apps.folder',
+                        parents: [folderId]
+                    },
+                    fields: 'id'
+                });
+                
+                targetFolderId = createResponse.result.id;
+                console.log('✅ Created new folder:', targetFolderId);
+            }
+
+            // Step 5: Upload file
+            statusDiv.innerHTML = '<i class="fas fa-upload"></i> Uploading file...';
+            console.log('⬆️ Uploading file:', file.name);
+            
+            const accessToken = token.access_token;
+            const form = new FormData();
+            
+            const metadata = {
+                name: `${pName}_${file.name}`,
+                parents: [targetFolderId]
+            };
+
+            form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+            form.append('file', file);
+
+            const uploadUrl = 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart';
+            console.log('📤 Sending request to:', uploadUrl);
+
+            const response = await fetch(uploadUrl, {
+                method: 'POST',
+                headers: { 
+                    'Authorization': 'Bearer ' + accessToken
+                },
+                body: form
+            });
+
+            console.log('📊 Response status:', response.status);
+            console.log('📊 Response OK:', response.ok);
+
+            // Try to parse response
+            let result;
+            const responseText = await response.text();
+            console.log('📄 Response text:', responseText);
+            
+            try {
+                result = JSON.parse(responseText);
+            } catch (parseErr) {
+                console.error('❌ Failed to parse response:', parseErr);
+                throw new Error(`Server response error (Status: ${response.status})`);
+            }
+
+            console.log('📊 Upload result:', result);
+
+            if (response.ok && result.id) {
+                // Success!
+                saveUploadRecord(pName, subject, file.name);
+                
+                statusDiv.className = 'status success show';
+                statusDiv.innerHTML = `
+                    <i class="fas fa-check-circle"></i> 
+                    <strong>Success!</strong><br>
+                    File uploaded to "${subject}" folder<br>
+                    <small>File ID: ${result.id}</small>
+                `;
+                
+                // Reset form
+                document.getElementById('fileInput').value = '';
+                document.getElementById('fileInfo').classList.remove('show');
+                document.getElementById('subjectInput').value = '';
+                document.getElementById('selectedSubject').value = '';
+                document.querySelectorAll('.subject-tag').forEach(t => t.classList.remove('active'));
+                
+                updateStats();
+            } else {
+                // API returned error
+                const errorMsg = result.error?.message || 
+                                result.error?.errors?.[0]?.message || 
+                                `HTTP ${response.status}: ${response.statusText}`;
+                console.error('❌ Upload failed:', errorMsg);
+                throw new Error(errorMsg);
+            }
+
+        } catch (apiErr) {
+            console.error('❌ API Error:', apiErr);
+            throw new Error(apiErr.message || 'Google Drive API error');
+        }
+
+    } catch (err) {
+        console.error('❌ Upload error:', err);
+        console.error('Error details:', {
+            message: err.message,
+            name: err.name,
+            stack: err.stack
+        });
+        
+        statusDiv.className = 'status error show';
+        
+        // Get specific error message
+        let errorMsg = 'Unknown error';
+        if (err) {
+            errorMsg = err.message || 
+                      err.toString() || 
+                      'An unexpected error occurred';
+        }
+        
+        // Common errors handling
+        if (errorMsg.includes('401')) {
+            errorMsg = 'Authentication failed. Please sign in again.';
+        } else if (errorMsg.includes('403')) {
+            errorMsg = 'Permission denied. Check folder access.';
+        } else if (errorMsg.includes('404')) {
+            errorMsg = 'Folder not found. Check Folder ID in settings.';
+        } else if (errorMsg.includes('quota')) {
+            errorMsg = 'Quota exceeded. Try again later.';
+        }
+        
+        statusDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> <strong>Error:</strong><br>${errorMsg}`;
+    }
+}   
 
         // Save upload record to localStorage
         function saveUploadRecord(name, subject, filename) {
