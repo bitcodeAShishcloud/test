@@ -139,10 +139,6 @@
             border-color: var(--primary);
         }
 
-        .subject-tag i {
-            margin-right: 5px;
-        }
-
         .file-info {
             background: var(--light);
             padding: 15px;
@@ -228,24 +224,38 @@
             color: white;
         }
 
-        .auth-status {
-            text-align: center;
-            padding: 10px;
+        .status-box {
+            padding: 12px;
             border-radius: 8px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .auth-status.logged-in {
+        .status-box.error {
+            background: rgba(234, 67, 53, 0.1);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+
+        .status-box.success {
             background: rgba(52, 168, 83, 0.1);
             color: var(--success);
             border: 1px solid var(--success);
         }
 
-        .auth-status.not-logged-in {
-            background: rgba(234, 67, 53, 0.1);
-            color: var(--danger);
-            border: 1px solid var(--danger);
+        .status-box.warning {
+            background: rgba(251, 188, 4, 0.1);
+            color: #b06000;
+            border: 1px solid var(--warning);
+        }
+
+        .status-box.info {
+            background: rgba(66, 133, 244, 0.1);
+            color: var(--primary);
+            border: 1px solid var(--primary);
         }
 
         .status-message {
@@ -417,36 +427,20 @@
             font-size: 0.9rem;
         }
 
-        /* Drive Status */
-        .drive-status {
-            background: var(--light);
-            padding: 12px;
+        /* Debug Info */
+        .debug-info {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 10px;
             border-radius: 8px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            margin-bottom: 15px;
             font-size: 0.85rem;
+            display: none;
         }
 
-        .drive-status.configured {
-            border-left: 4px solid var(--success);
-        }
-
-        .drive-status.not-configured {
-            border-left: 4px solid var(--warning);
-        }
-
-        .drive-status i {
-            font-size: 1.2rem;
-        }
-
-        .drive-status.configured i {
-            color: var(--success);
-        }
-
-        .drive-status.not-configured i {
-            color: var(--warning);
+        .debug-info.show {
+            display: block;
         }
 
         /* Animations */
@@ -484,16 +478,21 @@
             <p>Upload files directly to YOUR Google Drive</p>
         </div>
 
-        <!-- Auth Status -->
-        <div id="authStatus" class="auth-status not-logged-in">
-            <i class="fas fa-exclamation-circle"></i>
-            <span id="authText">Not logged in</span>
+        <!-- Debug Info -->
+        <div id="debugInfo" class="debug-info">
+            <strong>Debug Info:</strong><br>
+            <span id="debugText"></span>
         </div>
 
-        <!-- Drive Status -->
-        <div id="driveStatus" class="drive-status not-configured">
+        <!-- Status Boxes -->
+        <div id="authStatus" class="status-box warning">
+            <i class="fas fa-exclamation-circle"></i>
+            <span id="authText">Checking authentication...</span>
+        </div>
+
+        <div id="driveStatus" class="status-box warning">
             <i class="fas fa-folder"></i>
-            <span id="driveText">Drive folder not configured. Click ⚙️ to setup.</span>
+            <span id="driveText">Checking Drive configuration...</span>
         </div>
 
         <form id="uploadForm" onsubmit="handleUpload(event)">
@@ -597,7 +596,25 @@
             loadDriveStatus();
             loadUserName();
             checkAuthStatus();
+            showDebugInfo();
         });
+
+        // --- DEBUG FUNCTIONS ---
+        function showDebugInfo() {
+            const debugDiv = document.getElementById('debugInfo');
+            const debugText = document.getElementById('debugText');
+            const folderId = localStorage.getItem(STORAGE_KEYS.DRIVE_FOLDER);
+            const token = gapi.client ? gapi.client.getToken() : null;
+            
+            let info = [];
+            info.push(`API Initialized: ${gapiInited}`);
+            info.push(`GIS Initialized: ${gisInited}`);
+            info.push(`Logged In: ${token !== null}`);
+            info.push(`Folder ID Set: ${folderId ? 'Yes' : 'No'}`);
+            
+            debugText.innerHTML = info.join('<br>');
+            debugDiv.classList.add('show');
+        }
 
         // --- LOCAL STORAGE FUNCTIONS ---
         function loadSubjects() {
@@ -650,7 +667,6 @@
                 timestamp: new Date().toISOString()
             };
             
-            // Keep only last 50 entries to save space
             history.unshift(newEntry);
             if (history.length > 50) history.pop();
             
@@ -709,10 +725,10 @@
             const statusText = document.getElementById('driveText');
             
             if (folderId) {
-                statusDiv.className = 'drive-status configured';
+                statusDiv.className = 'status-box success';
                 statusText.innerHTML = '<i class="fas fa-check-circle"></i> Drive folder configured ✓';
             } else {
-                statusDiv.className = 'drive-status not-configured';
+                statusDiv.className = 'status-box warning';
                 statusText.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Drive folder not configured. Click ⚙️ to setup.';
             }
         }
@@ -799,6 +815,7 @@
             alert('✅ Settings saved successfully!');
             closeSettings();
             loadDriveStatus();
+            showDebugInfo();
         }
 
         // --- GOOGLE API FUNCTIONS ---
@@ -807,26 +824,44 @@
         }
 
         async function initializeGapiClient() {
-            await gapi.client.init({
-                apiKey: API_KEY,
-                discoveryDocs: [DISCOVERY_DOC],
-            });
-            gapiInited = true;
-            checkAuthStatus();
+            try {
+                await gapi.client.init({
+                    apiKey: API_KEY,
+                    discoveryDocs: [DISCOVERY_DOC],
+                });
+                gapiInited = true;
+                checkAuthStatus();
+                showDebugInfo();
+            } catch (err) {
+                console.error('GAPI Init Error:', err);
+                document.getElementById('authStatus').className = 'status-box error';
+                document.getElementById('authText').innerHTML = `<i class="fas fa-times-circle"></i> API Error: ${err.message}`;
+            }
         }
 
         function gisLoaded() {
-            tokenClient = google.accounts.oauth2.initTokenClient({
-                client_id: CLIENT_ID,
-                scope: SCOPES,
-                callback: '',
-            });
-            gisInited = true;
-            checkAuthStatus();
+            try {
+                tokenClient = google.accounts.oauth2.initTokenClient({
+                    client_id: CLIENT_ID,
+                    scope: SCOPES,
+                    callback: '',
+                });
+                gisInited = true;
+                checkAuthStatus();
+                showDebugInfo();
+            } catch (err) {
+                console.error('GIS Init Error:', err);
+                document.getElementById('authStatus').className = 'status-box error';
+                document.getElementById('authText').innerHTML = `<i class="fas fa-times-circle"></i> Auth Error: ${err.message}`;
+            }
         }
 
         function checkAuthStatus() {
-            if (!gapiInited || !gisInited) return;
+            if (!gapiInited || !gisInited) {
+                document.getElementById('authStatus').className = 'status-box warning';
+                document.getElementById('authText').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading authentication...';
+                return;
+            }
 
             const token = gapi.client.getToken();
             const authStatus = document.getElementById('authStatus');
@@ -834,15 +869,19 @@
             const submitBtn = document.getElementById('submitBtn');
 
             if (token !== null) {
-                authStatus.className = 'auth-status logged-in';
+                authStatus.className = 'status-box success';
                 authText.innerHTML = '<i class="fas fa-check-circle"></i> Logged in with Google';
                 submitBtn.disabled = false;
+                
+                // Remove sign in button if exists
+                const signInBtn = document.getElementById('signInBtn');
+                if (signInBtn) signInBtn.remove();
             } else {
-                authStatus.className = 'auth-status not-logged-in';
+                authStatus.className = 'status-box warning';
                 authText.innerHTML = '<i class="fas fa-exclamation-circle"></i> Not logged in - Click button below to sign in';
                 submitBtn.disabled = true;
                 
-                // Add sign in button if not logged in
+                // Add sign in button if not exists
                 if (!document.getElementById('signInBtn')) {
                     const signInBtn = document.createElement('button');
                     signInBtn.id = 'signInBtn';
@@ -852,12 +891,16 @@
                     document.getElementById('uploadForm').insertBefore(signInBtn, document.getElementById('submitBtn'));
                 }
             }
+            showDebugInfo();
         }
 
         function handleAuthClick() {
             tokenClient.callback = async (resp) => {
                 if (resp.error !== undefined) {
-                    throw (resp);
+                    console.error('Auth Error:', resp);
+                    document.getElementById('authStatus').className = 'status-box error';
+                    document.getElementById('authText').innerHTML = `<i class="fas fa-times-circle"></i> Auth Error: ${resp.error}`;
+                    return;
                 }
                 checkAuthStatus();
                 // Remove sign in button after login
@@ -881,23 +924,40 @@
             statusDiv.innerHTML = '';
 
             try {
-                // Get values
+                // Validation 1: Check Drive Folder
+                const folderId = localStorage.getItem(STORAGE_KEYS.DRIVE_FOLDER);
+                if (!folderId) {
+                    throw new Error('❌ Drive folder not configured. Please click ⚙️ Settings and add your Drive folder ID.');
+                }
+
+                // Validation 2: Check Authentication
+                const token = gapi.client.getToken();
+                if (!token) {
+                    throw new Error('❌ Not authenticated. Please click "Sign in with Google" button first.');
+                }
+
+                // Validation 3: Check API
+                if (!gapiInited || !gisInited) {
+                    throw new Error('❌ Google API not initialized. Please refresh the page and try again.');
+                }
+
+                // Get form values
                 const pName = document.getElementById('pName').value.trim();
                 const subject = document.getElementById('subjectInput').value.trim();
                 const fileInput = document.getElementById('fileInput');
                 const files = fileInput.files;
 
-                // Validation
+                // Validation 4: Form fields
                 if (!pName) {
-                    throw new Error('Please enter your name');
+                    throw new Error('❌ Please enter your name');
                 }
 
                 if (!subject) {
-                    throw new Error('Please enter a subject/category');
+                    throw new Error('❌ Please enter a subject/category');
                 }
 
                 if (!files || files.length === 0) {
-                    throw new Error('Please select at least one file');
+                    throw new Error('❌ Please select at least one file');
                 }
 
                 // Save name for next time
@@ -905,18 +965,6 @@
 
                 // Save subject
                 saveSubject(subject);
-
-                // Get folder ID
-                const folderId = localStorage.getItem(STORAGE_KEYS.DRIVE_FOLDER);
-                if (!folderId) {
-                    throw new Error('Please configure your Drive folder in Settings (⚙️)');
-                }
-
-                // Check auth
-                const token = gapi.client.getToken();
-                if (!token) {
-                    throw new Error('Please sign in with Google first');
-                }
 
                 // Find or create subject folder
                 statusDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking folder...';
@@ -980,14 +1028,18 @@
 
                         if (uploadResponse.ok && uploadResult.id) {
                             successCount++;
-                            // Save to history (only filename, not full path for privacy)
                             saveToHistory(pName, subject, file.name);
                         } else {
                             failCount++;
+                            console.error('Upload failed:', uploadResult);
+                            if (uploadResult.error) {
+                                throw new Error(uploadResult.error.message || 'Upload failed');
+                            }
                         }
                     } catch (fileErr) {
                         failCount++;
                         console.error('File upload error:', fileErr);
+                        throw new Error(`Failed to upload ${file.name}: ${fileErr.message}`);
                     }
                 }
 
@@ -1007,7 +1059,7 @@
 
             } catch (err) {
                 console.error('Upload error:', err);
-                statusDiv.innerHTML = `❌ Error: ${err.message}`;
+                statusDiv.innerHTML = `❌ Error: ${err.message || 'Unknown error occurred'}`;
                 statusDiv.className = 'status-message error';
             }
         }
