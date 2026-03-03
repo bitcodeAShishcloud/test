@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Universal File Upload - Ashish Gupta</title>
+    <title>My Secure Upload - Personal Drive</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -16,154 +16,173 @@
             --dark: #202124;
             --light: #f8f9fa;
             --gray: #5f6368;
-            --shadow: 0 2px 10px rgba(0,0,0,0.1);
-            --shadow-lg: 0 8px 30px rgba(0,0,0,0.15);
+            --light-gray: #e8eaed;
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.15);
             --radius: 12px;
         }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
-            color: var(--dark);
-            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
+
         .container {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        /* Header */
-        header {
-            text-align: center;
-            padding: 2rem 1rem;
-            margin-bottom: 2rem;
-        }
-        .logo {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 0.5rem;
-        }
-        .logo i {
-            font-size: 2rem;
-            color: var(--primary);
-            background: white;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: var(--shadow);
-        }
-        .logo h1 {
-            font-size: 1.8rem;
-            font-weight: 700;
-        }
-        .logo p {
-            color: var(--gray);
-            font-size: 0.95rem;
-        }
-        /* Settings Button */
-        .settings-btn {
-            position: fixed;
-            top: 15px;
-            right: 15px;
-            background: white;
-            border: none;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            font-size: 1.3rem;
-            cursor: pointer;
-            box-shadow: var(--shadow-lg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.2s;
-            z-index: 100;
-        }
-        .settings-btn:hover { transform: scale(1.05); }
-        /* Card */
-        .card {
             background: white;
             border-radius: var(--radius);
-            padding: 2rem;
             box-shadow: var(--shadow-lg);
-            margin-bottom: 1.5rem;
+            width: 100%;
+            max-width: 500px;
+            padding: 30px;
+            position: relative;
         }
-        .card-title {
-            font-size: 1.4rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid var(--light);
-            display: flex;
-            align-items: center;
-            gap: 10px;
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
         }
-        .card-title i { color: var(--primary); }
-        /* Form */
-        .form-group { margin-bottom: 1.2rem; }
+
+        .header i {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .header h1 {
+            color: var(--dark);
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .settings-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--light-gray);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: var(--gray);
+            transition: all 0.3s;
+        }
+
+        .settings-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
         label {
             display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
+            margin-bottom: 8px;
             color: var(--dark);
+            font-weight: 500;
+            font-size: 0.95rem;
         }
+
         input, select {
             width: 100%;
             padding: 12px 15px;
-            border: 2px solid #e0e0e0;
+            border: 2px solid var(--light-gray);
             border-radius: 8px;
             font-size: 1rem;
-            transition: border-color 0.2s;
+            transition: all 0.3s;
+            font-family: inherit;
         }
+
         input:focus, select:focus {
             outline: none;
             border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
         }
-        /* Subject Suggestions */
+
         .subject-suggestions {
-            margin-top: 0.5rem;
+            margin-top: 8px;
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
         }
+
         .subject-tag {
             background: var(--light);
             padding: 6px 12px;
             border-radius: 20px;
             font-size: 0.85rem;
+            color: var(--gray);
             cursor: pointer;
-            transition: all 0.2s;
-            border: 1px solid #ddd;
+            transition: all 0.3s;
+            border: 1px solid var(--light-gray);
         }
+
         .subject-tag:hover {
             background: var(--primary);
             color: white;
             border-color: var(--primary);
         }
-        /* File List */
-        .file-list {
-            background: var(--light);
-            border-radius: 8px;
-            padding: 1rem;
-            margin-top: 0.5rem;
-            max-height: 120px;
-            overflow-y: auto;
-            font-size: 0.9rem;
+
+        .subject-tag i {
+            margin-right: 5px;
         }
+
+        .file-info {
+            background: var(--light);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .file-info.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
         .file-item {
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 4px 0;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--light-gray);
         }
-        .file-item i { color: var(--primary); }
-        /* Buttons */
+
+        .file-item:last-child {
+            border-bottom: none;
+        }
+
+        .file-item i {
+            color: var(--primary);
+        }
+
+        .file-name {
+            flex: 1;
+            font-size: 0.9rem;
+            color: var(--dark);
+        }
+
+        .file-size {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
         .btn {
             width: 100%;
             padding: 14px;
@@ -172,278 +191,379 @@
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 10px;
         }
+
         .btn-primary {
-            background: linear-gradient(120deg, var(--primary), var(--primary-dark));
+            background: linear-gradient(120deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
+            box-shadow: var(--shadow);
         }
+
         .btn-primary:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: var(--shadow-lg);
         }
+
         .btn-primary:disabled {
-            background: #ccc;
+            background: var(--light-gray);
+            color: var(--gray);
             cursor: not-allowed;
+            transform: none;
         }
+
         .btn-secondary {
             background: white;
             color: var(--primary);
             border: 2px solid var(--primary);
+            margin-top: 10px;
         }
+
         .btn-secondary:hover {
             background: var(--primary);
             color: white;
         }
-        /* Auth Status */
+
         .auth-status {
             text-align: center;
-            padding: 1rem;
-            background: var(--light);
+            padding: 10px;
             border-radius: 8px;
-            margin-bottom: 1.5rem;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
         }
+
         .auth-status.logged-in {
-            background: #e8f5e9;
+            background: rgba(52, 168, 83, 0.1);
             color: var(--success);
-            border: 1px solid #c8e6c9;
+            border: 1px solid var(--success);
         }
-        /* Status Messages */
-        #status {
-            margin-top: 1rem;
-            padding: 1rem;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: 500;
-        }
-        .status-success {
-            background: #e8f5e9;
-            color: var(--success);
-            border: 1px solid #c8e6c9;
-        }
-        .status-error {
-            background: #ffebee;
+
+        .auth-status.not-logged-in {
+            background: rgba(234, 67, 53, 0.1);
             color: var(--danger);
-            border: 1px solid #ffcdd2;
+            border: 1px solid var(--danger);
         }
-        .status-info {
-            background: #e3f2fd;
-            color: var(--primary);
-            border: 1px solid #bbdefb;
+
+        .status-message {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            text-align: center;
+            display: none;
         }
+
+        .status-message.success {
+            background: rgba(52, 168, 83, 0.1);
+            color: var(--success);
+            border: 1px solid var(--success);
+            display: block;
+        }
+
+        .status-message.error {
+            background: rgba(234, 67, 53, 0.1);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+            display: block;
+        }
+
         /* Modal */
         .modal {
             display: none;
             position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
             z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.show {
+            display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            animation: fadeIn 0.3s ease;
         }
-        .modal.active { display: flex; }
+
         .modal-content {
             background: white;
+            padding: 30px;
             border-radius: var(--radius);
-            padding: 2rem;
-            width: 100%;
-            max-width: 450px;
-            box-shadow: var(--shadow-lg);
-            animation: slideIn 0.3s ease;
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+            animation: slideUp 0.3s ease;
         }
-        @keyframes slideIn {
-            from { transform: translateY(-20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--light);
-        }
+
         .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
             background: none;
             border: none;
             font-size: 1.5rem;
             cursor: pointer;
             color: var(--gray);
         }
-        .modal-close:hover { color: var(--danger); }
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 2rem 1rem;
+
+        .modal h3 {
+            margin-bottom: 20px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-info {
+            background: var(--light);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 0.85rem;
             color: var(--gray);
+            line-height: 1.6;
+        }
+
+        .modal-info strong {
+            color: var(--dark);
+        }
+
+        /* History Section */
+        .history-section {
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 2px dashed var(--light-gray);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .history-header h3 {
+            color: var(--dark);
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .clear-history {
+            background: none;
+            border: none;
+            color: var(--danger);
+            font-size: 0.85rem;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .clear-history:hover {
+            background: rgba(234, 67, 53, 0.1);
+        }
+
+        .history-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: var(--light);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+        }
+
+        .history-item i {
+            color: var(--success);
+        }
+
+        .history-details {
+            flex: 1;
+        }
+
+        .history-subject {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .history-file {
+            color: var(--gray);
+            font-size: 0.8rem;
+        }
+
+        .history-time {
+            color: var(--gray);
+            font-size: 0.75rem;
+        }
+
+        .no-history {
+            text-align: center;
+            color: var(--gray);
+            padding: 20px;
             font-size: 0.9rem;
         }
-        footer a {
-            color: var(--primary);
-            text-decoration: none;
-        }
-        .security-badge {
-            display: inline-flex;
+
+        /* Drive Status */
+        .drive-status {
+            background: var(--light);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
             align-items: center;
-            gap: 6px;
-            background: #e8f5e9;
-            color: var(--success);
-            padding: 6px 12px;
-            border-radius: 20px;
+            gap: 10px;
             font-size: 0.85rem;
-            margin-top: 1rem;
         }
+
+        .drive-status.configured {
+            border-left: 4px solid var(--success);
+        }
+
+        .drive-status.not-configured {
+            border-left: 4px solid var(--warning);
+        }
+
+        .drive-status i {
+            font-size: 1.2rem;
+        }
+
+        .drive-status.configured i {
+            color: var(--success);
+        }
+
+        .drive-status.not-configured i {
+            color: var(--warning);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
         /* Responsive */
         @media (max-width: 480px) {
-            .card { padding: 1.5rem; }
-            .logo h1 { font-size: 1.5rem; }
+            .container {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Settings Button -->
-    <button class="settings-btn" onclick="openSettings()" title="Settings">
-        <i class="fas fa-cog"></i>
-    </button>
-
     <div class="container">
-        <!-- Header -->
-        <header>
-            <div class="logo">
-                <i class="fas fa-cloud-upload-alt"></i>
-                <div>
-                    <h1>Universal File Upload</h1>
-                    <p>By Ashish Gupta</p>
-                </div>
-            </div>
-        </header>
+        <button class="settings-btn" onclick="openSettings()" title="Settings">
+            <i class="fas fa-cog"></i>
+        </button>
+
+        <div class="header">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <h1>My Secure Upload</h1>
+            <p>Upload files directly to YOUR Google Drive</p>
+        </div>
 
         <!-- Auth Status -->
-        <div id="authStatus" class="auth-status">
-            <button id="loginBtn" class="btn btn-secondary" onclick="handleAuthClick()">
-                <i class="fab fa-google"></i> Sign in with Google
+        <div id="authStatus" class="auth-status not-logged-in">
+            <i class="fas fa-exclamation-circle"></i>
+            <span id="authText">Not logged in</span>
+        </div>
+
+        <!-- Drive Status -->
+        <div id="driveStatus" class="drive-status not-configured">
+            <i class="fas fa-folder"></i>
+            <span id="driveText">Drive folder not configured. Click ⚙️ to setup.</span>
+        </div>
+
+        <form id="uploadForm" onsubmit="handleUpload(event)">
+            <div class="form-group">
+                <label><i class="fas fa-user"></i> Your Name</label>
+                <input type="text" id="pName" placeholder="Enter your name" required>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-folder"></i> Subject / Category</label>
+                <input type="text" id="subjectInput" placeholder="Type or select a subject" required oninput="filterSuggestions()">
+                <div id="subjectSuggestions" class="subject-suggestions"></div>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-file"></i> Select File(s)</label>
+                <input type="file" id="fileInput" multiple required onchange="showFileInfo()">
+                <div id="fileInfo" class="file-info"></div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="submitBtn" disabled>
+                <i class="fas fa-upload"></i>
+                <span>Upload to Drive</span>
             </button>
-            <div id="userInfo" style="display: none;">
-                <i class="fas fa-check-circle"></i> 
-                <span id="userEmail">user@gmail.com</span>
-            </div>
-        </div>
+        </form>
 
-        <!-- Main Form Card -->
-        <div class="card">
-            <h2 class="card-title"><i class="fas fa-file-upload"></i> Upload Files</h2>
-            
-            <form id="uploadForm" onsubmit="handleUpload(event)">
-                <!-- Name Field -->
-                <div class="form-group">
-                    <label for="pName"><i class="fas fa-user"></i> Your Name *</label>
-                    <input type="text" id="pName" required placeholder="Enter your name">
-                </div>
+        <div id="statusMessage" class="status-message"></div>
 
-                <!-- Subject Field -->
-                <div class="form-group">
-                    <label for="subjectInput"><i class="fas fa-tag"></i> Subject Name *</label>
-                    <input type="text" id="subjectInput" required placeholder="e.g., Mathematics, Notes, Projects" 
-                           list="subjectSuggestions" oninput="filterSuggestions()">
-                    <datalist id="subjectSuggestions"></datalist>
-                    
-                    <!-- Quick Select Tags -->
-                    <div class="subject-suggestions" id="subjectTags"></div>
-                </div>
-
-                <!-- File Type -->
-                <div class="form-group">
-                    <label for="fileType"><i class="fas fa-file"></i> File Type</label>
-                    <select id="fileType">
-                        <option value="application/pdf">📄 PDF</option>
-                        <option value="application/vnd.ms-powerpoint">📊 PPT</option>
-                        <option value="text/plain">📝 TXT</option>
-                        <option value="application/msword">📄 Word</option>
-                        <option value="image/*">🖼️ Image</option>
-                        <option value="video/*">🎥 Video</option>
-                        <option value="other">📦 Other</option>
-                    </select>
-                </div>
-
-                <!-- File Input -->
-                <div class="form-group">
-                    <label for="fileInput"><i class="fas fa-folder-open"></i> Select File(s) *</label>
-                    <input type="file" id="fileInput" multiple required>
-                    <div class="file-list" id="fileList" style="display: none;"></div>
-                </div>
-
-                <!-- Upload Button -->
-                <button type="submit" class="btn btn-primary" id="submitBtn" disabled>
-                    <i class="fas fa-cloud-upload-alt"></i> Upload to Your Drive
+        <!-- Upload History -->
+        <div class="history-section">
+            <div class="history-header">
+                <h3><i class="fas fa-history"></i> Upload History</h3>
+                <button class="clear-history" onclick="clearHistory()">
+                    <i class="fas fa-trash"></i> Clear
                 </button>
-            </form>
-
-            <!-- Status Message -->
-            <div id="status"></div>
-        </div>
-
-        <!-- Info Card -->
-        <div class="card">
-            <h2 class="card-title"><i class="fas fa-info-circle"></i> How It Works</h2>
-            <ol style="padding-left: 1.5rem; color: var(--gray);">
-                <li style="margin-bottom: 0.8rem;">🔐 Sign in with your Google account</li>
-                <li style="margin-bottom: 0.8rem;">⚙️ Set your Drive folder ID in Settings</li>
-                <li style="margin-bottom: 0.8rem;">📝 Enter name & create/select subject</li>
-                <li style="margin-bottom: 0.8rem;">📁 Select files & upload</li>
-                <li>✨ Files organize automatically in your Drive!</li>
-            </ol>
-            <div class="security-badge">
-                <i class="fas fa-shield-alt"></i>
-                <span>Files go directly to YOUR Drive - No third-party storage</span>
+            </div>
+            <div id="historyList" class="history-list">
+                <div class="no-history">No uploads yet</div>
             </div>
         </div>
-
-        <!-- Footer -->
-        <footer>
-            <p>Page Owner: <strong>Ashish Gupta</strong></p>
-            <p><a href="https://github.com/bitcodeAShishcloud" target="_blank">
-                <i class="fab fa-github"></i> GitHub Profile
-            </a></p>
-            <p style="margin-top: 1rem; font-size: 0.85rem;">
-                🔒 Fully Secure: Data uploads directly to your Google Drive.<br>
-                No information is stored on external servers.
-            </p>
-        </footer>
     </div>
 
     <!-- Settings Modal -->
     <div id="settingsModal" class="modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h3><i class="fas fa-cog"></i> Settings</h3>
-                <button class="modal-close" onclick="closeSettings()">&times;</button>
-            </div>
+            <button class="modal-close" onclick="closeSettings()">&times;</button>
+            <h3><i class="fas fa-cog"></i> Settings</h3>
             
+            <div class="modal-info">
+                <strong>📁 Google Drive Folder Setup</strong><br>
+                1. Create a folder in your Google Drive<br>
+                2. Right-click → Share → Copy link<br>
+                3. Paste the URL or Folder ID below<br>
+                4. Click Save Settings
+            </div>
+
             <div class="form-group">
-                <label><i class="fab fa-google-drive"></i> Your Drive Folder ID/URL</label>
-                <input type="text" id="driveFolderId" placeholder="Paste folder URL or ID here">
-                <small style="color: var(--gray); display: block; margin-top: 5px;">
-                    Files will be uploaded to this folder in YOUR Google Drive
-                </small>
+                <label>Drive Folder URL or ID</label>
+                <input type="text" id="driveFolderId" placeholder="https://drive.google.com/drive/folders/...">
             </div>
-            
-            <div class="form-group" style="margin-top: 1.5rem;">
-                <label><i class="fas fa-database"></i> Metadata Folder (Optional)</label>
-                <input type="text" id="metaFolderId" placeholder="Same as above or different folder">
-                <small style="color: var(--gray); display: block; margin-top: 5px;">
-                    Upload records (name, subject, filename) stored as JSON here
-                </small>
-            </div>
-            
-            <button class="btn btn-primary" onclick="saveSettings()" style="margin-top: 1rem;">
+
+            <button class="btn btn-primary" onclick="saveSettings()">
                 <i class="fas fa-save"></i> Save Settings
             </button>
+
+            <div class="modal-info" style="margin-top: 15px;">
+                <strong>🔒 Privacy Note:</strong><br>
+                Your folder ID is stored only in your browser (localStorage). 
+                It is NOT sent to any server. Only YOU can access your files.
+            </div>
         </div>
     </div>
 
@@ -452,19 +572,236 @@
     <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 
     <script>
-        // ================= CONFIGURATION =================
+        // --- CONFIGURATION ---
         const CLIENT_ID = '1073292672496-r70b2d6dj8rivtqard3t4g2th7g3ua58.apps.googleusercontent.com';
         const API_KEY = '';
         const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest';
         const SCOPES = 'https://www.googleapis.com/auth/drive.file';
-        
-        // Default metadata folder (your specified folder)
-        const DEFAULT_META_FOLDER = '1HEaB_VNuAoqM-ywS-aa5KZiaPSzHzUeX';
 
-        let tokenClient, gapiInited = false, gisInited = false;
-        let currentUserEmail = null;
+        let tokenClient;
+        let gapiInited = false;
+        let gisInited = false;
 
-        // ================= INITIALIZATION =================
+        // --- LOCAL STORAGE KEYS ---
+        const STORAGE_KEYS = {
+            DRIVE_FOLDER: 'userDriveFolderId',
+            SUBJECTS: 'userSubjects',
+            UPLOAD_HISTORY: 'uploadHistory',
+            USER_NAME: 'userName'
+        };
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSubjects();
+            loadHistory();
+            loadDriveStatus();
+            loadUserName();
+            checkAuthStatus();
+        });
+
+        // --- LOCAL STORAGE FUNCTIONS ---
+        function loadSubjects() {
+            const subjects = JSON.parse(localStorage.getItem(STORAGE_KEYS.SUBJECTS) || '[]');
+            renderSuggestions(subjects);
+        }
+
+        function saveSubject(subject) {
+            const subjects = JSON.parse(localStorage.getItem(STORAGE_KEYS.SUBJECTS) || '[]');
+            if (!subjects.includes(subject)) {
+                subjects.push(subject);
+                localStorage.setItem(STORAGE_KEYS.SUBJECTS, JSON.stringify(subjects));
+                renderSuggestions(subjects);
+            }
+        }
+
+        function renderSuggestions(subjects) {
+            const container = document.getElementById('subjectSuggestions');
+            container.innerHTML = '';
+            
+            subjects.forEach(subject => {
+                const tag = document.createElement('div');
+                tag.className = 'subject-tag';
+                tag.innerHTML = `<i class="fas fa-tag"></i> ${subject}`;
+                tag.onclick = () => {
+                    document.getElementById('subjectInput').value = subject;
+                };
+                container.appendChild(tag);
+            });
+        }
+
+        function filterSuggestions() {
+            const input = document.getElementById('subjectInput').value.toLowerCase();
+            const subjects = JSON.parse(localStorage.getItem(STORAGE_KEYS.SUBJECTS) || '[]');
+            const filtered = subjects.filter(s => s.toLowerCase().includes(input));
+            renderSuggestions(filtered);
+        }
+
+        function loadHistory() {
+            const history = JSON.parse(localStorage.getItem(STORAGE_KEYS.UPLOAD_HISTORY) || '[]');
+            renderHistory(history);
+        }
+
+        function saveToHistory(name, subject, fileName) {
+            const history = JSON.parse(localStorage.getItem(STORAGE_KEYS.UPLOAD_HISTORY) || '[]');
+            const newEntry = {
+                name: name,
+                subject: subject,
+                fileName: fileName,
+                timestamp: new Date().toISOString()
+            };
+            
+            // Keep only last 50 entries to save space
+            history.unshift(newEntry);
+            if (history.length > 50) history.pop();
+            
+            localStorage.setItem(STORAGE_KEYS.UPLOAD_HISTORY, JSON.stringify(history));
+            renderHistory(history);
+        }
+
+        function renderHistory(history) {
+            const container = document.getElementById('historyList');
+            
+            if (history.length === 0) {
+                container.innerHTML = '<div class="no-history">No uploads yet</div>';
+                return;
+            }
+
+            container.innerHTML = '';
+            history.forEach(item => {
+                const date = new Date(item.timestamp);
+                const timeAgo = getTimeAgo(date);
+                
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                div.innerHTML = `
+                    <i class="fas fa-check-circle"></i>
+                    <div class="history-details">
+                        <div class="history-subject">${item.subject}</div>
+                        <div class="history-file">${item.fileName}</div>
+                        <div class="history-time">${timeAgo}</div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function clearHistory() {
+            if (confirm('Are you sure you want to clear upload history?')) {
+                localStorage.removeItem(STORAGE_KEYS.UPLOAD_HISTORY);
+                loadHistory();
+            }
+        }
+
+        function getTimeAgo(date) {
+            const seconds = Math.floor((new Date() - date) / 1000);
+            
+            if (seconds < 60) return 'Just now';
+            if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+            if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+            if (seconds < 2592000) return `${Math.floor(seconds / 86400)}d ago`;
+            
+            return date.toLocaleDateString();
+        }
+
+        function loadDriveStatus() {
+            const folderId = localStorage.getItem(STORAGE_KEYS.DRIVE_FOLDER);
+            const statusDiv = document.getElementById('driveStatus');
+            const statusText = document.getElementById('driveText');
+            
+            if (folderId) {
+                statusDiv.className = 'drive-status configured';
+                statusText.innerHTML = '<i class="fas fa-check-circle"></i> Drive folder configured ✓';
+            } else {
+                statusDiv.className = 'drive-status not-configured';
+                statusText.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Drive folder not configured. Click ⚙️ to setup.';
+            }
+        }
+
+        function loadUserName() {
+            const savedName = localStorage.getItem(STORAGE_KEYS.USER_NAME);
+            if (savedName) {
+                document.getElementById('pName').value = savedName;
+            }
+        }
+
+        function saveUserName(name) {
+            localStorage.setItem(STORAGE_KEYS.USER_NAME, name);
+        }
+
+        // --- UI FUNCTIONS ---
+        function showFileInfo() {
+            const fileInput = document.getElementById('fileInput');
+            const fileInfo = document.getElementById('fileInfo');
+            const files = fileInput.files;
+            
+            if (files.length === 0) {
+                fileInfo.classList.remove('show');
+                return;
+            }
+
+            let html = '';
+            let totalSize = 0;
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                totalSize += file.size;
+                html += `
+                    <div class="file-item">
+                        <i class="fas fa-file"></i>
+                        <span class="file-name">${file.name}</span>
+                        <span class="file-size">${formatFileSize(file.size)}</span>
+                    </div>
+                `;
+            }
+
+            if (files.length > 1) {
+                html += `<div style="margin-top: 10px; font-size: 0.85rem; color: var(--gray);">
+                    <strong>${files.length}</strong> files selected (${formatFileSize(totalSize)} total)
+                </div>`;
+            }
+
+            fileInfo.innerHTML = html;
+            fileInfo.classList.add('show');
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function openSettings() {
+            const folderId = localStorage.getItem(STORAGE_KEYS.DRIVE_FOLDER);
+            document.getElementById('driveFolderId').value = folderId || '';
+            document.getElementById('settingsModal').classList.add('show');
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsModal').classList.remove('show');
+        }
+
+        function saveSettings() {
+            const url = document.getElementById('driveFolderId').value.trim();
+            
+            if (!url) {
+                alert('Please enter a Drive folder URL or ID');
+                return;
+            }
+
+            let folderId = url;
+            if (url.includes('/folders/')) {
+                folderId = url.split('/folders/')[1].split('?')[0].trim();
+            }
+
+            localStorage.setItem(STORAGE_KEYS.DRIVE_FOLDER, folderId);
+            alert('✅ Settings saved successfully!');
+            closeSettings();
+            loadDriveStatus();
+        }
+
+        // --- GOOGLE API FUNCTIONS ---
         function gapiLoaded() {
             gapi.load('client', initializeGapiClient);
         }
@@ -475,7 +812,7 @@
                 discoveryDocs: [DISCOVERY_DOC],
             });
             gapiInited = true;
-            maybeEnableButtons();
+            checkAuthStatus();
         }
 
         function gisLoaded() {
@@ -485,386 +822,203 @@
                 callback: '',
             });
             gisInited = true;
-            maybeEnableButtons();
+            checkAuthStatus();
         }
 
-        function maybeEnableButtons() {
-            if (gapiInited && gisInited) {
-                const token = gapi.client.getToken();
-                if (token !== null) {
-                    onAuthSuccess(token);
+        function checkAuthStatus() {
+            if (!gapiInited || !gisInited) return;
+
+            const token = gapi.client.getToken();
+            const authStatus = document.getElementById('authStatus');
+            const authText = document.getElementById('authText');
+            const submitBtn = document.getElementById('submitBtn');
+
+            if (token !== null) {
+                authStatus.className = 'auth-status logged-in';
+                authText.innerHTML = '<i class="fas fa-check-circle"></i> Logged in with Google';
+                submitBtn.disabled = false;
+            } else {
+                authStatus.className = 'auth-status not-logged-in';
+                authText.innerHTML = '<i class="fas fa-exclamation-circle"></i> Not logged in - Click button below to sign in';
+                submitBtn.disabled = true;
+                
+                // Add sign in button if not logged in
+                if (!document.getElementById('signInBtn')) {
+                    const signInBtn = document.createElement('button');
+                    signInBtn.id = 'signInBtn';
+                    signInBtn.className = 'btn btn-secondary';
+                    signInBtn.innerHTML = '<i class="fab fa-google"></i> Sign in with Google';
+                    signInBtn.onclick = handleAuthClick;
+                    document.getElementById('uploadForm').insertBefore(signInBtn, document.getElementById('submitBtn'));
                 }
             }
         }
 
-        // ================= AUTHENTICATION =================
         function handleAuthClick() {
             tokenClient.callback = async (resp) => {
-                if (resp.error) throw resp;
-                onAuthSuccess(gapi.client.getToken());
+                if (resp.error !== undefined) {
+                    throw (resp);
+                }
+                checkAuthStatus();
+                // Remove sign in button after login
+                const signInBtn = document.getElementById('signInBtn');
+                if (signInBtn) signInBtn.remove();
             };
 
-            if (!gapi.client.getToken()) {
-                tokenClient.requestAccessToken({ prompt: 'consent' });
+            if (gapi.client.getToken() === null) {
+                tokenClient.requestAccessToken({prompt: 'consent'});
             } else {
-                tokenClient.requestAccessToken({ prompt: '' });
+                tokenClient.requestAccessToken({prompt: ''});
             }
         }
 
-        async function onAuthSuccess(token) {
-            try {
-                // Get user email
-                const user = await gapi.client.oauth2.userinfo.get();
-                currentUserEmail = user.result.email;
-                
-                // Update UI
-                document.getElementById('loginBtn').style.display = 'none';
-                document.getElementById('userInfo').style.display = 'block';
-                document.getElementById('userEmail').textContent = currentUserEmail;
-                document.getElementById('authStatus').classList.add('logged-in');
-                document.getElementById('submitBtn').disabled = false;
-                
-                // Load user's subjects from localStorage
-                loadUserSubjects();
-                
-                // Load settings
-                loadSettings();
-                
-            } catch (err) {
-                console.error('Auth error:', err);
-                showStatus('Authentication failed. Please try again.', 'error');
-            }
-        }
-
-        // ================= SUBJECTS MANAGEMENT =================
-        function loadUserSubjects() {
-            if (!currentUserEmail) return;
-            
-            const key = `subjects_${currentUserEmail}`;
-            const saved = localStorage.getItem(key);
-            const subjects = saved ? JSON.parse(saved) : [];
-            
-            // Update datalist suggestions
-            const datalist = document.getElementById('subjectSuggestions');
-            datalist.innerHTML = '';
-            subjects.forEach(sub => {
-                const option = document.createElement('option');
-                option.value = sub;
-                datalist.appendChild(option);
-            });
-            
-            // Update quick-select tags
-            const tagsContainer = document.getElementById('subjectTags');
-            tagsContainer.innerHTML = '';
-            subjects.slice(0, 10).forEach(sub => {
-                const tag = document.createElement('span');
-                tag.className = 'subject-tag';
-                tag.textContent = sub;
-                tag.onclick = () => document.getElementById('subjectInput').value = sub;
-                tagsContainer.appendChild(tag);
-            });
-        }
-
-        function saveUserSubject(subject) {
-            if (!currentUserEmail || !subject) return;
-            
-            const key = `subjects_${currentUserEmail}`;
-            const saved = localStorage.getItem(key);
-            let subjects = saved ? JSON.parse(saved) : [];
-            
-            // Add if not exists, capitalize first letter
-            const normalized = subject.charAt(0).toUpperCase() + subject.slice(1).toLowerCase();
-            if (!subjects.includes(normalized)) {
-                subjects.push(normalized);
-                localStorage.setItem(key, JSON.stringify(subjects));
-                loadUserSubjects(); // Refresh UI
-            }
-        }
-
-        function filterSuggestions() {
-            // Optional: Add real-time filtering if needed
-        }
-
-        // ================= SETTINGS =================
-        function openSettings() {
-            document.getElementById('settingsModal').classList.add('active');
-        }
-
-        function closeSettings() {
-            document.getElementById('settingsModal').classList.remove('active');
-        }
-
-        function loadSettings() {
-            if (!currentUserEmail) return;
-            
-            const folderKey = `folder_${currentUserEmail}`;
-            const metaKey = `metaFolder_${currentUserEmail}`;
-            
-            document.getElementById('driveFolderId').value = 
-                localStorage.getItem(folderKey) || '';
-            document.getElementById('metaFolderId').value = 
-                localStorage.getItem(metaKey) || DEFAULT_META_FOLDER;
-        }
-
-        function saveSettings() {
-            if (!currentUserEmail) {
-                alert('Please sign in first!');
-                return;
-            }
-            
-            const folderUrl = document.getElementById('driveFolderId').value.trim();
-            const metaUrl = document.getElementById('metaFolderId').value.trim();
-            
-            // Extract IDs from URLs if needed
-            const folderId = extractFolderId(folderUrl);
-            const metaId = extractFolderId(metaUrl) || DEFAULT_META_FOLDER;
-            
-            if (!folderId) {
-                alert('Please enter a valid Drive Folder ID or URL');
-                return;
-            }
-            
-            // Save to localStorage (per user)
-            localStorage.setItem(`folder_${currentUserEmail}`, folderId);
-            localStorage.setItem(`metaFolder_${currentUserEmail}`, metaId);
-            
-            alert('✅ Settings saved! Files will upload to your Drive.');
-            closeSettings();
-        }
-
-        function extractFolderId(input) {
-            if (!input) return null;
-            // If it's already an ID (28-45 chars, alphanumeric + dash/underscore)
-            if (/^[a-zA-Z0-9_-]{28,45}$/.test(input)) return input;
-            // Extract from URL: https://drive.google.com/drive/folders/ID
-            const match = input.match(/\/folders\/([a-zA-Z0-9_-]+)/);
-            return match ? match[1] : null;
-        }
-
-        // ================= FILE UI =================
-        document.getElementById('fileInput').addEventListener('change', function(e) {
-            const files = e.target.files;
-            const listDiv = document.getElementById('fileList');
-            
-            if (files.length > 0) {
-                let html = '';
-                for (let file of files) {
-                    const size = formatFileSize(file.size);
-                    html += `<div class="file-item"><i class="fas fa-file"></i> ${file.name} <small>(${size})</small></div>`;
-                }
-                listDiv.innerHTML = html;
-                listDiv.style.display = 'block';
-            } else {
-                listDiv.style.display = 'none';
-            }
-        });
-
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
-        }
-
-        // ================= UPLOAD LOGIC =================
+        // --- UPLOAD FUNCTION ---
         async function handleUpload(e) {
             e.preventDefault();
-            const statusDiv = document.getElementById('status');
+            
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.className = 'status-message';
             statusDiv.innerHTML = '';
-            statusDiv.className = '';
 
             try {
-                // Validate auth
-                if (!currentUserEmail || !gapi.client.getToken()) {
-                    showStatus('❌ Please sign in first', 'error');
-                    return;
-                }
-
-                // Get form values
+                // Get values
                 const pName = document.getElementById('pName').value.trim();
                 const subject = document.getElementById('subjectInput').value.trim();
-                const files = document.getElementById('fileInput').files;
-                
-                if (!pName || !subject || files.length === 0) {
-                    showStatus('❌ Please fill all required fields', 'error');
-                    return;
+                const fileInput = document.getElementById('fileInput');
+                const files = fileInput.files;
+
+                // Validation
+                if (!pName) {
+                    throw new Error('Please enter your name');
                 }
 
-                // Save subject for future suggestions
-                saveUserSubject(subject);
-                const normalizedSubject = subject.charAt(0).toUpperCase() + subject.slice(1).toLowerCase();
+                if (!subject) {
+                    throw new Error('Please enter a subject/category');
+                }
 
-                // Get folder IDs
-                const folderId = localStorage.getItem(`folder_${currentUserEmail}`);
-                const metaFolderId = localStorage.getItem(`metaFolder_${currentUserEmail}`) || DEFAULT_META_FOLDER;
-                
+                if (!files || files.length === 0) {
+                    throw new Error('Please select at least one file');
+                }
+
+                // Save name for next time
+                saveUserName(pName);
+
+                // Save subject
+                saveSubject(subject);
+
+                // Get folder ID
+                const folderId = localStorage.getItem(STORAGE_KEYS.DRIVE_FOLDER);
                 if (!folderId) {
-                    showStatus('❌ Please set your Drive Folder ID in Settings ⚙️', 'error');
-                    openSettings();
-                    return;
+                    throw new Error('Please configure your Drive folder in Settings (⚙️)');
                 }
 
-                showStatus('🔍 Checking subject folder...', 'info');
+                // Check auth
+                const token = gapi.client.getToken();
+                if (!token) {
+                    throw new Error('Please sign in with Google first');
+                }
 
                 // Find or create subject folder
-                const targetFolderId = await getOrCreateFolder(folderId, normalizedSubject);
-                
-                // Upload files
-                showStatus(`📤 Uploading ${files.length} file(s)...`, 'info');
-                const results = [];
-                
-                for (let i = 0; i < files.length; i++) {
-                    const file = files[i];
-                    showStatus(`📤 ${i+1}/${files.length}: ${file.name}`, 'info');
-                    
-                    const fileId = await uploadFileToDrive(file, pName, targetFolderId);
-                    results.push({
-                        name: file.name,
-                        size: file.size,
-                        driveId: fileId,
-                        uploadedAt: new Date().toISOString()
+                statusDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking folder...';
+                statusDiv.classList.add('success');
+
+                const listResponse = await gapi.client.drive.files.list({
+                    q: `'${folderId}' in parents and name='${subject}' and mimeType='application/vnd.google-apps.folder' and trashed=false`,
+                    fields: 'files(id, name)',
+                    spaces: 'drive'
+                });
+
+                let targetFolderId = folderId;
+                const filesList = listResponse.result?.files || [];
+
+                if (filesList.length > 0) {
+                    targetFolderId = filesList[0].id;
+                } else {
+                    statusDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating folder...';
+                    const folderMetadata = {
+                        'name': subject,
+                        'mimeType': 'application/vnd.google-apps.folder',
+                        'parents': [folderId]
+                    };
+
+                    const createResponse = await gapi.client.drive.files.create({
+                        resource: folderMetadata,
+                        fields: 'id'
                     });
+                    targetFolderId = createResponse.result.id;
                 }
 
-                // Save metadata to JSON file
-                showStatus('💾 Saving upload record...', 'info');
-                await saveMetadata({
-                    userEmail: currentUserEmail,
-                    userName: pName,
-                    subject: normalizedSubject,
-                    files: results,
-                    uploadedAt: new Date().toISOString(),
-                    targetFolder: targetFolderId
-                }, metaFolderId);
-
-                // Success!
-                const successMsg = `✅ Success! ${results.length} file(s) uploaded to "${normalizedSubject}" folder in your Drive.`;
-                showStatus(successMsg, 'success');
+                // Upload files
+                statusDiv.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Uploading ${files.length} file(s)...`;
                 
-                // Reset form
-                document.getElementById('uploadForm').reset();
-                document.getElementById('fileList').style.display = 'none';
+                let successCount = 0;
+                let failCount = 0;
+
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    statusDiv.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Uploading ${i+1}/${files.length}: ${file.name}`;
+
+                    try {
+                        const accessToken = token.access_token;
+                        const form = new FormData();
+
+                        const metadata = {
+                            'name': `${pName}_${file.name}`,
+                            'parents': [targetFolderId]
+                        };
+
+                        form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+                        form.append('file', file);
+
+                        const uploadResponse = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+                            method: 'POST',
+                            headers: new Headers({ 'Authorization': 'Bearer ' + accessToken }),
+                            body: form
+                        });
+
+                        const uploadResult = await uploadResponse.json();
+
+                        if (uploadResponse.ok && uploadResult.id) {
+                            successCount++;
+                            // Save to history (only filename, not full path for privacy)
+                            saveToHistory(pName, subject, file.name);
+                        } else {
+                            failCount++;
+                        }
+                    } catch (fileErr) {
+                        failCount++;
+                        console.error('File upload error:', fileErr);
+                    }
+                }
+
+                // Show result
+                if (successCount > 0) {
+                    statusDiv.innerHTML = `✅ Success! ${successCount}/${files.length} file(s) uploaded to "${subject}" folder`;
+                    statusDiv.className = 'status-message success';
+                    
+                    // Reset form but keep name and subject suggestions
+                    document.getElementById('fileInput').value = '';
+                    document.getElementById('fileInfo').classList.remove('show');
+                }
+
+                if (failCount > 0) {
+                    statusDiv.innerHTML += `<br>❌ ${failCount} file(s) failed`;
+                }
 
             } catch (err) {
                 console.error('Upload error:', err);
-                showStatus(`❌ Error: ${err.message || 'Upload failed'}`, 'error');
+                statusDiv.innerHTML = `❌ Error: ${err.message}`;
+                statusDiv.className = 'status-message error';
             }
         }
 
-        // Find or create folder in Drive
-        async function getOrCreateFolder(parentId, folderName) {
-            // Search for existing folder
-            const response = await gapi.client.drive.files.list({
-                q: `'${parentId}' in parents and name='${folderName}' and mimeType='application/vnd.google-apps.folder' and trashed=false`,
-                fields: 'files(id, name)',
-                spaces: 'drive'
-            });
-
-            const files = response.result.files || [];
-            if (files.length > 0) {
-                console.log(`Found folder: ${folderName}`);
-                return files[0].id;
-            }
-
-            // Create new folder
-            console.log(`Creating folder: ${folderName}`);
-            const createResponse = await gapi.client.drive.files.create({
-                resource: {
-                    name: folderName,
-                    mimeType: 'application/vnd.google-apps.folder',
-                    parents: [parentId]
-                },
-                fields: 'id'
-            });
-            return createResponse.result.id;
-        }
-
-        // Upload single file to Drive
-        async function uploadFileToDrive(file, userName, folderId) {
-            const accessToken = gapi.client.getToken().access_token;
-            const fileName = `${userName}_${file.name}`;
-            
-            const metadata = {
-                name: fileName,
-                parents: [folderId]
-            };
-
-            const form = new FormData();
-            form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-            form.append('file', file);
-
-            const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-                method: 'POST',
-                headers: { 'Authorization': 'Bearer ' + accessToken },
-                body: form
-            });
-
-            const result = await response.json();
-            if (!response.ok || !result.id) {
-                throw new Error(result.error?.message || 'Upload failed');
-            }
-            return result.id;
-        }
-
-        // Save metadata as JSON file in Drive
-        async function saveMetadata(data, folderId) {
-            const accessToken = gapi.client.getToken().access_token;
-            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-            const fileName = `upload_${data.userEmail.split('@')[0]}_${timestamp}.json`;
-            
-            const metadata = {
-                name: fileName,
-                parents: [folderId],
-                mimeType: 'application/json'
-            };
-
-            const form = new FormData();
-            form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-            form.append('file', new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
-
-            const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-                method: 'POST',
-                headers: { 'Authorization': 'Bearer ' + accessToken },
-                body: form
-            });
-
-            const result = await response.json();
-            if (!response.ok) {
-                console.warn('Metadata save warning:', result);
-                // Don't fail the upload if metadata save fails
-            }
-            return result;
-        }
-
-        // ================= UI HELPERS =================
-        function showStatus(message, type) {
-            const div = document.getElementById('status');
-            div.innerHTML = message;
-            div.className = `status-${type}`;
-            
-            // Auto-clear success messages after 5 seconds
-            if (type === 'success') {
-                setTimeout(() => {
-                    if (div.className.includes('success')) {
-                        div.innerHTML = '';
-                        div.className = '';
-                    }
-                }, 5000);
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('settingsModal');
+            if (event.target === modal) {
+                closeSettings();
             }
         }
-
-        // Close modal on outside click
-        document.getElementById('settingsModal').addEventListener('click', function(e) {
-            if (e.target === this) closeSettings();
-        });
-
-        // Initialize on load
-        window.onload = function() {
-            if (gapiInited && gisInited) {
-                maybeEnableButtons();
-            }
-        };
     </script>
 </body>
 </html>
