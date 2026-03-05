@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FluentAI — English Practice Coach</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500&display=swap');
+:root{--bg:#04060f;--s1:#080d1c;--s2:#0d1326;--border:#1e2640;--border2:#2a3356;--blue:#4d7cff;--cyan:#00d4ff;--green:#00e5a0;--yellow:#ffc84d;--red:#ff5c7a;--purple:#a855f7;--text:#dce4ff;--muted:#5a6490;--muted2:#3a4060}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 50% at 15% 0%,rgba(77,124,255,.1) 0%,transparent 60%),radial-gradient(ellipse 50% 40% at 85% 100%,rgba(0,212,255,.07) 0%,transparent 60%);pointer-events:none;z-index:0}
+#setupScreen{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto}
+.setup-card{background:var(--s1);border:1px solid var(--border);border-radius:22px;padding:30px 26px;max-width:500px;width:100%;animation:fadeUp .5s ease;margin:auto}
+.setup-logo{display:flex;align-items:center;gap:11px;margin-bottom:18px}
+.setup-logo-icon{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--blue),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:21px;box-shadow:0 0 24px rgba(77,124,255,.5)}
+.setup-logo-text{font-size:22px;font-weight:800;letter-spacing:-1px}
+.setup-logo-text em{font-style:normal;color:var(--cyan)}
+.setup-tagline{font-size:12px;color:var(--muted);margin-bottom:22px;line-height:1.6}
+.setup-section{margin-bottom:18px}
+.setup-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
+.api-tabs{display:flex;background:var(--s2);border:1px solid var(--border);border-radius:11px;padding:3px;gap:3px}
+.api-tab{flex:1;padding:9px 6px;border:none;border-radius:8px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;background:transparent;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.3}
+.api-tab.active{background:linear-gradient(135deg,var(--blue),var(--cyan));color:#fff;box-shadow:0 3px 14px rgba(77,124,255,.4)}
+.api-tab-sub{font-size:9px;font-family:'JetBrains Mono',monospace;opacity:.8}
+.key-panel{background:var(--s2);border:1px solid var(--border);border-radius:11px;padding:13px;display:flex;flex-direction:column;gap:9px}
+.key-row{display:flex;flex-direction:column;gap:4px}
+.key-label-small{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--muted)}
+.key-input-wrap{position:relative}
+.key-input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 36px 9px 12px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:12px;outline:none;transition:border-color .2s}
+.key-input:focus{border-color:var(--blue)}
+.key-input::placeholder{color:var(--muted)}
+.key-eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--muted);font-size:13px;background:none;border:none}
+.key-hint{font-size:11px;color:var(--muted);line-height:1.5}
+.key-hint a{color:var(--cyan);text-decoration:none}
+.key-hint a:hover{text-decoration:underline}
+.free-badge{display:inline-block;background:rgba(0,229,160,.12);border:1px solid rgba(0,229,160,.25);color:var(--green);font-size:10px;font-family:'JetBrains Mono',monospace;padding:2px 8px;border-radius:7px;margin-bottom:4px}
+.model-select{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 11px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11px;outline:none;cursor:pointer}
+.model-select:focus{border-color:var(--blue)}
+.model-select option{background:var(--s1)}
+.setup-err{font-size:11px;color:var(--red);font-family:'JetBrains Mono',monospace;margin-bottom:10px;display:none;background:rgba(255,92,122,.08);border:1px solid rgba(255,92,122,.2);border-radius:8px;padding:8px 10px}
+.start-btn{width:100%;padding:13px;border:none;border-radius:11px;background:linear-gradient(135deg,var(--blue),var(--cyan));color:#fff;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .25s;box-shadow:0 4px 20px rgba(77,124,255,.4);display:flex;align-items:center;justify-content:center;gap:8px}
+.start-btn:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(77,124,255,.6)}
+#appScreen{display:none}
+.wrap{max-width:1100px;margin:0 auto;padding:16px 14px;position:relative;z-index:1}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px}
+.logo{display:flex;align-items:center;gap:9px}
+.logo-mark{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--blue),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:15px;box-shadow:0 0 14px rgba(77,124,255,.4)}
+.logo-name{font-size:18px;font-weight:800;letter-spacing:-1px}
+.logo-name em{font-style:normal;color:var(--cyan)}
+.header-right{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.api-pill{font-family:'JetBrains Mono',monospace;font-size:10px;padding:3px 9px;border-radius:13px}
+.api-pill.claude{background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.3);color:var(--purple)}
+.api-pill.gemini{background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.25);color:var(--green)}
+.api-pill.openrouter{background:rgba(255,200,77,.1);border:1px solid rgba(255,200,77,.25);color:var(--yellow)}
+.level-badge{font-family:'JetBrains Mono',monospace;font-size:10px;padding:3px 9px;border-radius:13px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.25);color:var(--cyan);letter-spacing:1px}
+.change-btn{font-size:11px;color:var(--muted);background:none;border:1px solid var(--border);border-radius:7px;padding:3px 8px;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all .2s}
+.change-btn:hover{border-color:var(--border2);color:var(--text)}
+.mode-toggle{display:flex;background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:3px;gap:3px;margin-bottom:18px;max-width:340px}
+.mode-btn{flex:1;padding:8px 14px;border:none;border-radius:7px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .25s;background:transparent;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:6px}
+.mode-btn.active{background:linear-gradient(135deg,var(--blue),var(--cyan));color:#fff;box-shadow:0 3px 12px rgba(77,124,255,.35)}
+.mode-btn .pri{font-size:9px;padding:1px 5px;border-radius:5px;background:rgba(255,255,255,.2)}
+.main{display:grid;grid-template-columns:1fr 290px;gap:14px}
+@media(max-width:700px){.main{grid-template-columns:1fr}}
+#speakMode,#chatMode{display:flex;flex-direction:column;gap:12px}
+#chatMode{display:none}
+.orb-panel{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:24px 16px;display:flex;flex-direction:column;align-items:center;gap:16px}
+.orb-wrap{position:relative;display:flex;align-items:center;justify-content:center}
+.ring{position:absolute;border-radius:50%;border:1px solid rgba(77,124,255,.1);animation:rp 3s infinite}
+.ring:nth-child(1){width:116px;height:116px}
+.ring:nth-child(2){width:152px;height:152px;animation-delay:.6s;border-color:rgba(0,212,255,.07)}
+.ring:nth-child(3){width:188px;height:188px;animation-delay:1.2s;border-color:rgba(168,85,247,.05)}
+@keyframes rp{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.04);opacity:1}}
+.orb{width:80px;height:80px;border-radius:50%;position:relative;z-index:2;background:linear-gradient(135deg,var(--blue),var(--cyan),var(--purple));display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 0 30px rgba(77,124,255,.5);transition:all .3s;cursor:pointer;user-select:none}
+.orb:active{transform:scale(.93)}
+.orb.listening{animation:op .85s infinite;box-shadow:0 0 42px rgba(0,229,160,.6);background:linear-gradient(135deg,var(--green),var(--cyan))}
+.orb.processing{animation:ospin 1.5s linear infinite}
+@keyframes op{0%,100%{transform:scale(1)}50%{transform:scale(1.09)}}
+@keyframes ospin{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(360deg)}}
+.orb-status{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);letter-spacing:1px;text-align:center;min-height:18px}
+.orb-status.on{color:var(--green)}.orb-status.proc{color:var(--cyan)}
+.live-tx{width:100%;background:var(--s2);border:1px solid var(--border2);border-radius:9px;padding:11px 13px;min-height:52px;font-size:14px;line-height:1.6;transition:all .2s}
+.live-tx.on{border-color:rgba(0,229,160,.4)}
+.live-tx-final{color:var(--text)}
+.live-tx-interim{color:var(--muted);font-style:italic}
+.live-tx-placeholder{color:var(--muted);font-style:italic}
+.speak-btns{display:flex;gap:7px;width:100%}
+.s-btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 16px;border-radius:9px;border:none;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.s-btn.main{background:linear-gradient(135deg,var(--blue),var(--cyan));color:#fff;flex:1;box-shadow:0 3px 13px rgba(77,124,255,.4)}
+.s-btn.main.rec{background:linear-gradient(135deg,var(--green),var(--cyan));animation:rp2 1s infinite}
+@keyframes rp2{0%,100%{box-shadow:0 3px 13px rgba(0,229,160,.4)}50%{box-shadow:0 3px 24px rgba(0,229,160,.7)}}
+.s-btn.main:disabled{opacity:.4;cursor:not-allowed;transform:none!important;animation:none!important}
+.s-btn.sec{background:var(--s2);border:1px solid var(--border);color:var(--muted)}
+.s-btn.sec:hover{color:var(--text);border-color:var(--border2)}
+.no-mic{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--yellow);background:rgba(255,200,77,.07);border:1px solid rgba(255,200,77,.2);border-radius:8px;padding:8px 12px;text-align:center;display:none}
+.ai-reply{background:var(--s2);border:1px solid var(--border);border-radius:12px;padding:13px;display:none;animation:fadeUp .3s ease}
+.ai-reply.show{display:block}
+.air-head{display:flex;align-items:center;gap:7px;margin-bottom:7px;font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace}
+.air-text{font-size:14px;line-height:1.7}
+.tts-btn{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);border-radius:7px;color:var(--cyan);font-size:10px;cursor:pointer;font-family:'JetBrains Mono',monospace;margin-left:auto;transition:all .2s}
+.tts-btn:hover{background:rgba(0,212,255,.2)}
+.corr-card{background:var(--s1);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:none}
+.corr-card.show{display:block;animation:fadeUp .3s ease}
+.corr-head{display:flex;align-items:center;justify-content:space-between;padding:12px 15px;border-bottom:1px solid var(--border);background:var(--s2)}
+.corr-title{font-size:13px;font-weight:700;display:flex;align-items:center;gap:7px}
+.ov-score{font-family:'JetBrains Mono',monospace;font-size:12px;padding:3px 11px;border-radius:13px}
+.corr-body{padding:13px 15px;display:flex;flex-direction:column;gap:10px}
+.diff-block{display:flex;flex-direction:column;gap:4px}
+.diff-lbl{font-size:10px;font-family:'JetBrains Mono',monospace;letter-spacing:1.2px;color:var(--muted);text-transform:uppercase}
+.diff-txt{font-size:13px;line-height:1.6;padding:8px 11px;border-radius:7px}
+.diff-txt.orig{background:rgba(255,92,122,.07);border:1px solid rgba(255,92,122,.18);color:#ff8fa3}
+.diff-txt.fixed{background:rgba(0,229,160,.07);border:1px solid rgba(0,229,160,.18);color:var(--green)}
+.err-chip{display:inline-block;background:rgba(255,92,122,.15);border-bottom:2px solid var(--red);border-radius:3px;padding:0 3px;font-size:13px}
+.fix-chip{display:inline-block;background:rgba(0,229,160,.15);border-bottom:2px solid var(--green);border-radius:3px;padding:0 3px;font-size:13px}
+.fb2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fb-box{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:9px 10px}
+.fb-box-title{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--muted);letter-spacing:1px;margin-bottom:4px}
+.fb-box-val{font-size:12px;line-height:1.5;color:var(--text)}
+.vocab-up{display:flex;flex-direction:column;gap:5px}
+.vu-row{display:flex;align-items:center;gap:5px;font-size:13px;flex-wrap:wrap}
+.vu-old{color:var(--muted);text-decoration:line-through}
+.vu-new{color:var(--cyan);font-weight:600}
+.vu-why{color:var(--muted2);font-size:11px;font-style:italic}
+.enc{text-align:center;font-size:12px;color:var(--green);padding:3px 0}
+.chat-wrap{background:var(--s1);border:1px solid var(--border);border-radius:16px;display:flex;flex-direction:column;overflow:hidden;min-height:440px}
+.chat-head{padding:11px 14px;border-bottom:1px solid var(--border);background:var(--s2);display:flex;align-items:center;gap:8px}
+.ch-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-size:14px}
+.ch-info .cn{font-size:13px;font-weight:700}
+.ch-info .cr{font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace}
+.spd-meter{margin-left:auto;text-align:right}
+.spd-lbl{font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--muted);letter-spacing:1px}
+.spd-val{font-size:13px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.spd-val.slow{color:var(--red)}.spd-val.mid{color:var(--yellow)}.spd-val.fast{color:var(--green)}
+.chat-msgs{flex:1;overflow-y:auto;padding:13px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
+.chat-msgs::-webkit-scrollbar{width:3px}
+.chat-msgs::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.cm{display:flex;gap:7px;animation:fadeUp .3s ease}
+.cm.user{flex-direction:row-reverse}
+.cm-av{width:25px;height:25px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;margin-top:2px}
+.cm.ai .cm-av{background:linear-gradient(135deg,var(--blue),var(--cyan))}
+.cm.user .cm-av{background:linear-gradient(135deg,var(--purple),var(--blue))}
+.cm-body{max-width:80%}
+.cm-bub{padding:8px 12px;border-radius:12px;font-size:13px;line-height:1.6}
+.cm.ai .cm-bub{background:var(--s2);border:1px solid var(--border);border-top-left-radius:3px}
+.cm.user .cm-bub{background:rgba(77,124,255,.13);border:1px solid rgba(77,124,255,.22);border-top-right-radius:3px}
+.cm-corr{margin-top:6px;background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:8px 10px;font-size:12px;display:flex;flex-direction:column;gap:6px}
+.cc-sec .cc-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.cc-sec .cc-val{line-height:1.5}
+.spd-bar-wrap{margin-top:4px}
+.spd-bar-track{height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.spd-bar-fill{height:100%;border-radius:2px;transition:width .4s}
+.cm-meta{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);margin-top:3px}
+.wpm-tag{padding:1px 5px;border-radius:5px;font-size:9px;background:rgba(255,255,255,.04)}
+.typing-ind{display:flex;gap:4px;padding:8px 12px;background:var(--s2);border:1px solid var(--border);border-radius:12px;border-top-left-radius:3px;width:fit-content}
+.td{width:5px;height:5px;border-radius:50%;background:var(--muted);animation:tdb 1.2s infinite}
+.td:nth-child(2){animation-delay:.2s}.td:nth-child(3){animation-delay:.4s}
+@keyframes tdb{0%,60%,100%{transform:translateY(0);opacity:.35}30%{transform:translateY(-5px);opacity:1}}
+.chat-inp-area{padding:10px 13px;border-top:1px solid var(--border);background:var(--s2)}
+.chat-row{display:flex;gap:6px;align-items:flex-end}
+.chat-ta{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:8px 11px;color:var(--text);font-family:'Outfit',sans-serif;font-size:13px;resize:none;line-height:1.5;min-height:38px;max-height:100px;outline:none;transition:border-color .2s}
+.chat-ta:focus{border-color:var(--blue)}
+.chat-ta::placeholder{color:var(--muted)}
+.chat-send{width:38px;height:38px;border:none;border-radius:9px;cursor:pointer;background:linear-gradient(135deg,var(--blue),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:15px;transition:all .2s;flex-shrink:0}
+.chat-send:hover{transform:scale(1.05)}
+.chat-send:disabled{opacity:.35;cursor:not-allowed;transform:none}
+.sidebar{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:12px}
+.card-title{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
+.stat-g{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.s-box{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:8px;text-align:center}
+.s-num{font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace}
+.s-lab{font-size:9px;color:var(--muted);margin-top:1px}
+.topic-g{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.t-btn{padding:6px 5px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Outfit',sans-serif;font-size:11px;cursor:pointer;transition:all .2s;text-align:center}
+.t-btn:hover{border-color:var(--blue);color:var(--blue)}
+.t-btn.active{background:rgba(77,124,255,.13);border-color:var(--blue);color:var(--blue)}
+.score-bars{display:flex;flex-direction:column;gap:6px}
+.sb-row{display:flex;align-items:center;gap:7px}
+.sb-lbl{font-size:11px;color:var(--muted);width:76px;flex-shrink:0}
+.sb-track{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.sb-fill{height:100%;border-radius:2px;transition:width .6s ease}
+.sb-val{font-family:'JetBrains Mono',monospace;font-size:10px;width:24px;text-align:right}
+.vocab-list{display:flex;flex-direction:column;gap:5px}
+.vl-i{display:flex;gap:5px;align-items:flex-start;padding:5px 7px;background:var(--s2);border-radius:6px;font-size:11px}
+.vl-w{color:var(--cyan);font-weight:600;white-space:nowrap}
+.vl-d{color:var(--muted);line-height:1.4}
+.pron-tips{display:flex;flex-direction:column;gap:6px}
+.pt{display:flex;gap:6px;font-size:11px;line-height:1.5;color:var(--muted)}
+.pt-ic{color:var(--cyan);flex-shrink:0}
+.reset-btn{width:100%;padding:8px;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-family:'Outfit',sans-serif;font-size:12px;cursor:pointer;transition:all .2s}
+.reset-btn:hover{border-color:var(--red);color:var(--red)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<div id="setupScreen">
+  <div class="setup-card">
+    <div class="setup-logo">
+      <div class="setup-logo-icon">🗣</div>
+      <div class="setup-logo-text">Fluent<em>AI</em></div>
+    </div>
+    <div class="setup-tagline">AI-powered English coach · Grammar correction · Vocabulary · Pronunciation · Speaking & Writing practice</div>
+    <div class="setup-section">
+      <div class="setup-label">Step 1 · Choose AI Provider</div>
+      <div class="api-tabs">
+        <button class="api-tab" id="tabGemini" onclick="selectAPI('gemini')">✦ Gemini<span class="api-tab-sub">Free tier</span></button>
+        <button class="api-tab active" id="tabClaude" onclick="selectAPI('claude')">◆ Claude<span class="api-tab-sub">Best quality</span></button>
+        <button class="api-tab" id="tabOpenrouter" onclick="selectAPI('openrouter')">⚡ OpenRouter<span class="api-tab-sub">✅ Works on web</span></button>
+      </div>
+    </div>
+    <div class="setup-section" id="keySection">
+      <div id="claudePanel" class="key-panel">
+        <div style="background:rgba(255,92,122,.08);border:1px solid rgba(255,92,122,.2);border-radius:8px;padding:8px 10px;font-size:11px;color:#ff8fa3;margin-bottom:6px;font-family:'JetBrains Mono',monospace">⚠ Claude is <strong>blocked by CORS</strong> on GitHub Pages. Use <strong>OpenRouter</strong> instead for deployed apps.</div>
+        <div class="key-row">
+          <div class="key-label-small">Anthropic API Key (works on localhost only)</div>
+          <div class="key-input-wrap"><input class="key-input" id="claudeKey" type="password" placeholder="sk-ant-api03-..." autocomplete="off"/><button class="key-eye" onclick="toggleVis('claudeKey')">👁</button></div>
+          <div class="key-hint">Free $5 credits → <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></div>
+        </div>
+      </div>
+      <div id="geminiPanel" class="key-panel" style="display:none">
+        <div class="free-badge">✅ FREE TIER</div>
+        <div class="key-row">
+          <div class="key-label-small">Google Gemini API Key</div>
+          <div class="key-input-wrap"><input class="key-input" id="geminiKey" type="password" placeholder="AIzaSy..." autocomplete="off"/><button class="key-eye" onclick="toggleVis('geminiKey')">👁</button></div>
+          <div class="key-hint">Free key → <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com/app/apikey</a><br>✅ Uses Gemini 2.0 Flash — higher free quota than 1.5. Auto-retries on limit.</div>
+        </div>
+      </div>
+      <div id="openrouterPanel" class="key-panel" style="display:none">
+        <div style="background:rgba(0,229,160,.08);border:1px solid rgba(0,229,160,.25);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--green);margin-bottom:6px;font-family:'JetBrains Mono',monospace">✅ <strong>RECOMMENDED for GitHub Pages</strong> — OpenRouter supports browser requests (no CORS block). Has free models!</div>
+        <div class="key-row">
+          <div class="key-label-small">OpenRouter API Key</div>
+          <div class="key-input-wrap"><input class="key-input" id="openrouterKey" type="password" placeholder="sk-or-v1-..." autocomplete="off"/><button class="key-eye" onclick="toggleVis('openrouterKey')">👁</button></div>
+          <div class="key-hint">Free key → <a href="https://openrouter.ai/keys" target="_blank">openrouter.ai/keys</a></div>
+        </div>
+        <div class="key-row">
+          <div class="key-label-small">Select Model</div>
+          <select class="model-select" id="orModel">
+            <optgroup label="🆓 Free Models">
+              <option value="meta-llama/llama-3.3-70b-instruct:free">Llama 3.3 70B ⭐ (Free)</option>
+              <option value="google/gemma-3-27b-it:free">Gemma 3 27B (Free)</option>
+              <option value="mistralai/mistral-7b-instruct:free">Mistral 7B (Free)</option>
+              <option value="qwen/qwen-2.5-72b-instruct:free">Qwen 2.5 72B (Free)</option>
+            </optgroup>
+            <optgroup label="💎 Paid (better)">
+              <option value="anthropic/claude-sonnet-4">Claude Sonnet 4</option>
+              <option value="openai/gpt-4o-mini">GPT-4o Mini</option>
+              <option value="openai/gpt-4o">GPT-4o</option>
+            </optgroup>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="setup-err" id="setupErr"></div>
+    <button class="start-btn" onclick="startApp()">🚀 Start Practicing English</button>
+  </div>
+</div>
+
+<div id="appScreen">
+<div class="wrap">
+  <header>
+    <div class="logo"><div class="logo-mark">🗣</div><div class="logo-name">Fluent<em>AI</em></div></div>
+    <div class="header-right">
+      <div class="api-pill" id="apiPill">◆ Claude</div>
+      <div class="level-badge" id="levelBadge">BEGINNER</div>
+      <button class="change-btn" onclick="changeAPI()">⇄ Switch AI</button>
+    </div>
+  </header>
+  <div class="mode-toggle">
+    <button class="mode-btn active" id="btnSpeak" onclick="switchMode('speak')">🎙 Speak <span class="pri">PRIMARY</span></button>
+    <button class="mode-btn" id="btnChat" onclick="switchMode('chat')">💬 Chat</button>
+  </div>
+  <div class="main">
+    <div>
+      <div id="speakMode">
+        <div class="orb-panel">
+          <div class="orb-wrap">
+            <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+            <div class="orb" id="orb" onclick="toggleSpeak()">🎙</div>
+          </div>
+          <div class="orb-status" id="orbSt">Tap the orb to start speaking</div>
+          <div class="live-tx" id="liveTx"><span class="live-tx-placeholder">Your speech will appear here...</span></div>
+          <div class="speak-btns">
+            <button class="s-btn main" id="spkBtn" onclick="toggleSpeak()">🎙 Tap to Speak</button>
+            <button class="s-btn sec" onclick="clearSpeak()">✕ Clear</button>
+          </div>
+          <div class="no-mic" id="noMic">⚠ Microphone not supported. Use Chrome or Edge browser.</div>
+        </div>
+        <div class="ai-reply" id="aiReply">
+          <div class="air-head"><span>🤖 FluentAI Coach</span><button class="tts-btn" onclick="speakTTS(document.getElementById('airTxt').textContent)">🔊 Listen</button></div>
+          <div class="air-text" id="airTxt"></div>
+        </div>
+        <div class="corr-card" id="corrCard">
+          <div class="corr-head"><div class="corr-title">📝 Full Correction Report</div><div class="ov-score" id="ovScore">—</div></div>
+          <div class="corr-body" id="corrBody"></div>
+        </div>
+      </div>
+      <div id="chatMode">
+        <div class="chat-wrap">
+          <div class="chat-head">
+            <div class="ch-av">🤖</div>
+            <div class="ch-info"><div class="cn">FluentAI Coach</div><div class="cr" id="chatTopicLabel">Daily Life Practice</div></div>
+            <div class="spd-meter"><div class="spd-lbl">TYPING SPEED</div><div class="spd-val" id="spdVal">— WPM</div></div>
+          </div>
+          <div class="chat-msgs" id="chatMsgs"></div>
+          <div class="chat-inp-area">
+            <div class="chat-row">
+              <textarea class="chat-ta" id="chatTa" placeholder="Type anything in English..." rows="1" onkeydown="chatKey(event)" oninput="chatChange()"></textarea>
+              <button class="chat-send" id="chatSendBtn" onclick="sendChat()">➤</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="sidebar">
+      <div class="card">
+        <div class="card-title">📊 Session Stats</div>
+        <div class="stat-g">
+          <div class="s-box"><div class="s-num" id="stTurns" style="color:var(--green)">0</div><div class="s-lab">Attempts</div></div>
+          <div class="s-box"><div class="s-num" id="stScore" style="color:var(--cyan)">—</div><div class="s-lab">Avg Score</div></div>
+          <div class="s-box"><div class="s-num" id="stErr" style="color:var(--yellow)">0</div><div class="s-lab">Errors Fixed</div></div>
+          <div class="s-box"><div class="s-num" id="stVoc" style="color:var(--purple)">0</div><div class="s-lab">New Words</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🎯 Practice Topic</div>
+        <div class="topic-g">
+          <button class="t-btn active" onclick="setTopic(this,'Daily Life')">☀ Daily Life</button>
+          <button class="t-btn" onclick="setTopic(this,'Job Interview')">💼 Interview</button>
+          <button class="t-btn" onclick="setTopic(this,'Travel')">✈ Travel</button>
+          <button class="t-btn" onclick="setTopic(this,'Business')">📈 Business</button>
+          <button class="t-btn" onclick="setTopic(this,'Storytelling')">📖 Story</button>
+          <button class="t-btn" onclick="setTopic(this,'Free Talk')">💬 Free Talk</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🏆 Last Scores</div>
+        <div class="score-bars">
+          <div class="sb-row"><div class="sb-lbl">Grammar</div><div class="sb-track"><div class="sb-fill" id="sb-g" style="width:0%;background:var(--green)"></div></div><div class="sb-val" id="sv-g">—</div></div>
+          <div class="sb-row"><div class="sb-lbl">Vocabulary</div><div class="sb-track"><div class="sb-fill" id="sb-v" style="width:0%;background:var(--cyan)"></div></div><div class="sb-val" id="sv-v">—</div></div>
+          <div class="sb-row"><div class="sb-lbl">Fluency</div><div class="sb-track"><div class="sb-fill" id="sb-f" style="width:0%;background:var(--blue)"></div></div><div class="sb-val" id="sv-f">—</div></div>
+          <div class="sb-row"><div class="sb-lbl">Style</div><div class="sb-track"><div class="sb-fill" id="sb-s" style="width:0%;background:var(--purple)"></div></div><div class="sb-val" id="sv-s">—</div></div>
+          <div class="sb-row"><div class="sb-lbl">Pronunciation</div><div class="sb-track"><div class="sb-fill" id="sb-p" style="width:0%;background:var(--yellow)"></div></div><div class="sb-val" id="sv-p">—</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📚 Vocab Learned</div>
+        <div class="vocab-list" id="vocabList"><div style="font-size:11px;color:var(--muted);font-style:italic">New words appear as you practice...</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">🔊 Pronunciation Tips</div>
+        <div class="pron-tips">
+          <div class="pt"><span class="pt-ic">▸</span>Stress: pre-SENT (verb) vs PRE-sent (noun)</div>
+          <div class="pt"><span class="pt-ic">▸</span>Link words: "want to" → "wanna"</div>
+          <div class="pt"><span class="pt-ic">▸</span>Reduce vowels: "about" → "uh-BOUT"</div>
+          <div class="pt"><span class="pt-ic">▸</span>Finals matter: "bat" ≠ "bad" ≠ "ban"</div>
+        </div>
+      </div>
+      <button class="reset-btn" onclick="resetAll()">↺ Reset Session</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+// STATE
+let apiProvider='claude', apiKey='', orModel='meta-llama/llama-3.3-70b-instruct:free';
+let topic='Daily Life', mode='speak';
+let spkHistory=[], chatHistory=[];
+let stats={turns:0,score:0,errors:0,vocab:0};
+let learnedWords=[];
+let isProcessing=false;
+let recognition=null, isRecording=false;
+// SPEECH FIX: track finalized text only, no accumulation
+let finalizedText='';
+
+// SETUP
+function selectAPI(p){
+  apiProvider=p;
+  ['claude','gemini','openrouter'].forEach(id=>{
+    const tab=document.getElementById('tab'+id.charAt(0).toUpperCase()+id.slice(1));
+    if(tab) tab.classList.toggle('active',id===p);
+    const panel=document.getElementById(id+'Panel');
+    if(panel) panel.style.display=id===p?'block':'none';
+  });
+}
+function toggleVis(id){const i=document.getElementById(id);i.type=i.type==='password'?'text':'password';}
+function showErr(msg){const e=document.getElementById('setupErr');e.textContent='⚠ '+msg;e.style.display='block';}
+function startApp(){
+  document.getElementById('setupErr').style.display='none';
+  if(apiProvider==='claude'){
+    apiKey=document.getElementById('claudeKey').value.trim();
+    if(!apiKey.startsWith('sk-')){showErr('Enter a valid Claude key (starts with sk-ant...)');return;}
+  }else if(apiProvider==='gemini'){
+    apiKey=document.getElementById('geminiKey').value.trim();
+    if(!apiKey.startsWith('AIza')){showErr('Enter a valid Gemini key (starts with AIza...)');return;}
+  }else{
+    apiKey=document.getElementById('openrouterKey').value.trim();
+    orModel=document.getElementById('orModel').value;
+    if(!apiKey.startsWith('sk-or-')){showErr('Enter a valid OpenRouter key (starts with sk-or-...)');return;}
+  }
+  document.getElementById('setupScreen').style.display='none';
+  document.getElementById('appScreen').style.display='block';
+  const pill=document.getElementById('apiPill');
+  const labels={claude:'◆ Claude',gemini:'✦ Gemini',openrouter:'⚡ '+orModel.split('/').pop().split(':')[0]};
+  pill.textContent=labels[apiProvider]||'⚡ OpenRouter';
+  pill.className='api-pill '+apiProvider;
+  setupSpeech();
+  switchMode('speak');
+}
+function changeAPI(){document.getElementById('appScreen').style.display='none';document.getElementById('setupScreen').style.display='flex';}
+
+// PROMPT
+function sysPrompt(inputType){
+  return `You are FluentAI, an expert English language coach. The user is practicing English (${inputType}) on the topic: "${topic}".
+Respond ONLY in this exact JSON (no extra text, no markdown):
+{"coach_reply":"Natural reply + follow-up question to keep conversation going.","correction":{"original":"Exact text user said","corrected":"Fully corrected natural English","has_errors":true},"errors":[{"wrong":"wrong phrase","right":"correct phrase","rule":"brief explanation"}],"vocabulary_upgrades":[{"basic":"word used","better":"better word","why":"reason"}],"style_feedback":"1-2 sentences on style/tone/formality.","pronunciation_tip":"One specific tip with phonetic hint.","scores":{"grammar":85,"vocabulary":70,"fluency":80,"style":75,"pronunciation":70},"new_word":{"word":"useful word","definition":"short definition","example":"example"},"encouragement":"One short encouraging sentence."}
+Rules: errors and vocabulary_upgrades can be []. Always provide corrected sentence. Be honest but kind.`;
+}
+
+// API CALL with auto-retry on quota
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+async function callAPI(userText,hist,retry=0){
+  const inputType=mode==='speak'?'speaking (speech-to-text)':'typing (chat)';
+  try{
+    let raw='';
+    const msgs=[...hist,{role:'user',content:userText}];
+    if(apiProvider==='claude'){
+      // Claude requires anthropic-dangerous-direct-browser-access for CORS
+      const r=await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        mode:'cors',
+        headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+        body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:sysPrompt(inputType),messages:msgs})
+      });
+      if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error('Claude '+(r.status)+': '+(e?.error?.message||r.statusText));}
+      const d=await r.json();
+      raw=d.content?.map(c=>c.text||'').join('')||'';
+    }else if(apiProvider==='gemini'){
+      const gm=hist.map(m=>({role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]}));
+      gm.push({role:'user',parts:[{text:userText}]});
+      const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,{
+        method:'POST',
+        mode:'cors',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({systemInstruction:{parts:[{text:sysPrompt(inputType)}]},contents:gm,generationConfig:{maxOutputTokens:1000}})
+      });
+      if(!r.ok){
+        const e=await r.json().catch(()=>({}));
+        const code=e?.error?.code||r.status;
+        if(code===429&&retry<3){await sleep(2000*(retry+1));return callAPI(userText,hist,retry+1);}
+        if(code===429) throw new Error('Gemini quota reached. Wait 1 min or switch to OpenRouter (free models).');
+        throw new Error('Gemini '+(code)+': '+(e?.error?.message||r.statusText));
+      }
+      const d=await r.json();
+      raw=d.candidates?.[0]?.content?.parts?.[0]?.text||'';
+    }else{
+      // OpenRouter has proper CORS support for browser requests
+      const r=await fetch('https://openrouter.ai/api/v1/chat/completions',{
+        method:'POST',
+        mode:'cors',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey,'HTTP-Referer':location.origin,'X-Title':'FluentAI'},
+        body:JSON.stringify({model:orModel,max_tokens:1000,messages:[{role:'system',content:sysPrompt(inputType)},...msgs.map(m=>({role:m.role==='assistant'?'assistant':'user',content:m.content}))]})
+      });
+      if(!r.ok){
+        const e=await r.json().catch(()=>({}));
+        const code=e?.error?.code||r.status;
+        if(code===429&&retry<2){await sleep(3000*(retry+1));return callAPI(userText,hist,retry+1);}
+        throw new Error('OpenRouter '+(code)+': '+(e?.error?.message||r.statusText));
+      }
+      const d=await r.json();
+      raw=d.choices?.[0]?.message?.content||'';
+    }
+    const clean=raw.replace(/```json|```/g,'').trim();
+    let parsed;
+    try{parsed=JSON.parse(clean);}catch{const m=clean.match(/\{[\s\S]*\}/);parsed=m?JSON.parse(m[0]):null;}
+    return parsed;
+  }catch(e){
+    console.error('API error:',e);
+    let msg=e.message||'Unknown error';
+    // "Failed to fetch" = CORS block or no internet
+    if(msg.toLowerCase().includes('failed to fetch')||msg.toLowerCase().includes('networkerror')||msg.toLowerCase().includes('load failed')){
+      if(apiProvider==='claude') msg='Claude API blocked by browser CORS. ✅ Fix: Switch to OpenRouter (works on all browsers). Claude only works on localhost.';
+      else if(apiProvider==='gemini') msg='Gemini API blocked by browser CORS on this domain. ✅ Fix: Switch to OpenRouter — it supports browser requests.';
+      else msg='Network error. Check your internet connection and API key.';
+    }
+    return{coach_reply:'⚠ '+msg,correction:null,errors:[],vocabulary_upgrades:[],scores:null};
+  }
+}
+
+// ── SPEECH: Create a brand-new instance every recording to prevent any transcript bleed ──
+const SpeechAPI=window.SpeechRecognition||window.webkitSpeechRecognition;
+function setupSpeech(){
+  if(!SpeechAPI){document.getElementById('noMic').style.display='block';document.getElementById('spkBtn').disabled=true;}
+}
+
+function buildRecognition(){
+  // Always create fresh — never reuse old instance
+  const rec=new SpeechAPI();
+  rec.lang='en-US';
+  rec.continuous=false;       // single utterance, no looping
+  rec.interimResults=true;
+  rec.maxAlternatives=1;
+
+  let bestTranscript='';      // local to this recording session only
+
+  rec.onresult=(e)=>{
+    // Walk all results, take highest-confidence final or latest interim
+    let interim='';
+    for(let i=0;i<e.results.length;i++){
+      const r=e.results[i];
+      if(r.isFinal) bestTranscript=r[0].transcript.trim();
+      else interim=r[0].transcript.trim();
+    }
+    const display=bestTranscript||interim;
+    const el=document.getElementById('liveTx');
+    if(bestTranscript){
+      el.innerHTML='<span class="live-tx-final">'+esc(bestTranscript)+'</span>';
+    }else if(interim){
+      el.innerHTML='<span class="live-tx-interim">'+esc(interim)+'...</span>';
+    }
+    el.classList.toggle('on',!!display);
+  };
+
+  rec.onend=()=>{
+    if(!isRecording) return;   // user manually stopped before onend fired
+    isRecording=false; orbUI('idle');
+    const toSend=bestTranscript.trim();
+    if(toSend) processSpeak(toSend);
+    else setLiveTx('placeholder','No speech detected. Tap to try again.');
+  };
+
+  rec.onerror=(evt)=>{
+    isRecording=false; orbUI('idle');
+    if(evt.error==='no-speech') setLiveTx('placeholder','No speech heard. Tap to try again.');
+    else if(evt.error==='not-allowed') setLiveTx('placeholder','Microphone permission denied.');
+  };
+
+  return rec;
+}
+
+function setLiveTx(type,msg){
+  const el=document.getElementById('liveTx');
+  el.innerHTML=`<span class="live-tx-${type}">${esc(msg)}</span>`;
+  el.classList.toggle('on',type!=='placeholder');
+}
+
+function toggleSpeak(){
+  if(isProcessing) return;
+  if(!SpeechAPI){document.getElementById('noMic').style.display='block';return;}
+
+  if(isRecording){
+    // User tapped stop — abort current instance cleanly
+    isRecording=false;
+    if(recognition){try{recognition.abort();}catch(e){}}
+    recognition=null;
+    orbUI('idle');
+  }else{
+    // Destroy any previous instance completely, create fresh one
+    if(recognition){try{recognition.abort();}catch(e){}}
+    recognition=null;
+    finalizedText='';
+
+    setLiveTx('interim','Listening... speak now 🎤');
+    recognition=buildRecognition();
+    try{
+      recognition.start();
+      isRecording=true;
+      orbUI('listening');
+    }catch(e){
+      // tiny delay if browser needs to release mic
+      setTimeout(()=>{
+        try{recognition=buildRecognition();recognition.start();isRecording=true;orbUI('listening');}
+        catch(e2){setLiveTx('placeholder','Could not start mic. Check browser permissions.');}
+      },300);
+    }
+  }
+}
+
+function clearSpeak(){
+  if(isRecording){try{recognition.abort();}catch(e){}isRecording=false;}
+  recognition=null; finalizedText='';
+  setLiveTx('placeholder','Your speech will appear here...');
+  document.getElementById('aiReply').classList.remove('show');
+  document.getElementById('corrCard').classList.remove('show');
+  orbUI('idle');
+}
+
+function orbUI(st){
+  const orb=document.getElementById('orb'),stEl=document.getElementById('orbSt'),btn=document.getElementById('spkBtn');
+  orb.className='orb'+(st==='listening'?' listening':st==='processing'?' processing':'');
+  if(st==='listening'){orb.textContent='🔴';stEl.textContent='Listening... tap again to stop';stEl.className='orb-status on';btn.textContent='⏹ Stop';btn.classList.add('rec');}
+  else if(st==='processing'){orb.textContent='⚙️';stEl.textContent='Analyzing your English...';stEl.className='orb-status proc';btn.textContent='⏳ Analyzing...';btn.classList.remove('rec');}
+  else{orb.textContent='🎙';stEl.textContent='Tap the orb to start speaking';stEl.className='orb-status';btn.textContent='🎙 Tap to Speak';btn.classList.remove('rec');}
+}
+
+async function processSpeak(text){
+  if(!text||isProcessing) return;
+  isProcessing=true; orbUI('processing');
+  const result=await callAPI(text,spkHistory);
+  isProcessing=false; orbUI('idle');
+  if(!result) return;
+  spkHistory.push({role:'user',content:text});
+  spkHistory.push({role:'assistant',content:JSON.stringify(result)});
+  document.getElementById('airTxt').textContent=result.coach_reply||'';
+  document.getElementById('aiReply').classList.add('show');
+  renderCorrCard(result,text);
+  updateScores(result.scores); updateStats(result);
+  if(result.new_word?.word) addWord(result.new_word);
+}
+
+// CORRECTION CARD
+function renderCorrCard(r,orig){
+  const card=document.getElementById('corrCard'),body=document.getElementById('corrBody'),sc=document.getElementById('ovScore');
+  const avg=r.scores?Math.round((r.scores.grammar+r.scores.vocabulary+r.scores.fluency+r.scores.style+r.scores.pronunciation)/5):0;
+  const col=avg>=80?'var(--green)':avg>=60?'var(--yellow)':'var(--red)';
+  sc.textContent=avg+'/100';sc.style.color=col;
+  sc.style.background=avg>=80?'rgba(0,229,160,.1)':avg>=60?'rgba(255,200,77,.1)':'rgba(255,92,122,.1)';
+  sc.style.border='1px solid '+(avg>=80?'rgba(0,229,160,.3)':avg>=60?'rgba(255,200,77,.3)':'rgba(255,92,122,.3)');
+  let h='';
+  if(r.correction){h+=`<div class="diff-block"><div class="diff-lbl">You said</div><div class="diff-txt orig">${esc(r.correction.original||orig)}</div></div><div class="diff-block"><div class="diff-lbl">${r.correction.has_errors?'✅ Corrected':'✅ Correct — well done!'}</div><div class="diff-txt fixed">${esc(r.correction.corrected||orig)}</div></div>`;}
+  if(r.errors?.length){h+=`<div><div class="diff-lbl" style="margin-bottom:6px">❌ Errors (${r.errors.length})</div>`;r.errors.forEach(e=>{h+=`<div style="margin-bottom:5px;font-size:13px"><span class="err-chip">${esc(e.wrong)}</span><span style="color:var(--muted2);margin:0 5px">→</span><span class="fix-chip">${esc(e.right)}</span><div style="font-size:11px;color:var(--muted);margin-top:3px;font-family:'JetBrains Mono',monospace">${esc(e.rule)}</div></div>`;});h+=`</div>`;}
+  if(r.vocabulary_upgrades?.length){h+=`<div><div class="diff-lbl" style="margin-bottom:6px">📈 Vocabulary Upgrades</div><div class="vocab-up">`;r.vocabulary_upgrades.forEach(v=>{h+=`<div class="vu-row"><span class="vu-old">${esc(v.basic)}</span><span style="color:var(--muted2)">→</span><span class="vu-new">${esc(v.better)}</span><span class="vu-why">· ${esc(v.why)}</span></div>`;});h+=`</div></div>`;}
+  h+=`<div class="fb2"><div class="fb-box"><div class="fb-box-title">✍ Style</div><div class="fb-box-val">${esc(r.style_feedback||'—')}</div></div><div class="fb-box"><div class="fb-box-title">🔊 Pronunciation</div><div class="fb-box-val">${esc(r.pronunciation_tip||'—')}</div></div></div>`;
+  if(r.encouragement) h+=`<div class="enc">⭐ ${esc(r.encouragement)}</div>`;
+  body.innerHTML=h; card.classList.add('show');
+  card.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// CHAT
+function switchMode(m){
+  mode=m;
+  document.getElementById('btnSpeak').classList.toggle('active',m==='speak');
+  document.getElementById('btnChat').classList.toggle('active',m==='chat');
+  document.getElementById('speakMode').style.display=m==='speak'?'flex':'none';
+  document.getElementById('chatMode').style.display=m==='chat'?'flex':'none';
+  if(m==='chat'&&chatHistory.length===0) initChat();
+}
+function initChat(){
+  document.getElementById('chatTopicLabel').textContent=topic+' Practice';
+  addCM('ai',`Hi! I'm your FluentAI English coach. Let's practice "${topic}". Type anything in English — I'll correct grammar, upgrade vocabulary, and give pronunciation tips! 😊`,null,null);
+}
+let typingStart=null,typingWords=0;
+function chatChange(){const el=document.getElementById('chatTa');el.style.height='auto';el.style.height=Math.min(el.scrollHeight,100)+'px';if(!typingStart)typingStart=Date.now();typingWords=el.value.trim().split(/\s+/).filter(w=>w).length;}
+function chatKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();}}
+async function sendChat(){
+  const el=document.getElementById('chatTa');const text=el.value.trim();
+  if(!text||isProcessing) return;
+  let wpm=0;if(typingStart&&typingWords>0){const m=(Date.now()-typingStart)/60000;wpm=Math.round(typingWords/m);}
+  typingStart=null;typingWords=0;el.value='';el.style.height='auto';
+  addCM('user',text,wpm,null);updateSpdDisplay(wpm);
+  showTyping();isProcessing=true;document.getElementById('chatSendBtn').disabled=true;
+  const result=await callAPI(text,chatHistory);
+  hideTyping();isProcessing=false;document.getElementById('chatSendBtn').disabled=false;
+  if(!result){addCM('ai','⚠ Connection error. Check your API key.',null,null);return;}
+  chatHistory.push({role:'user',content:text});chatHistory.push({role:'assistant',content:JSON.stringify(result)});
+  addCM('ai',result.coach_reply||'',null,result);
+  updateScores(result.scores);updateStats(result);if(result.new_word?.word)addWord(result.new_word);
+}
+function addCM(role,text,wpm,r){
+  const c=document.getElementById('chatMsgs'),d=document.createElement('div');d.className='cm '+role;
+  let corrHtml='';
+  if(r&&role==='ai'){
+    let parts=[];
+    if(r.correction?.has_errors) parts.push(`<div class="cc-sec"><div class="cc-lbl">✅ Corrected</div><div class="cc-val" style="color:var(--green)">${esc(r.correction.corrected)}</div></div>`);
+    if(r.errors?.length){const el2=r.errors.map(e=>`<span class="err-chip" title="${esc(e.rule)}">${esc(e.wrong)}</span>→<span class="fix-chip">${esc(e.right)}</span>`).join(' · ');parts.push(`<div class="cc-sec"><div class="cc-lbl">❌ Errors</div><div class="cc-val">${el2}</div></div>`);}
+    if(r.vocabulary_upgrades?.length){const vl=r.vocabulary_upgrades.map(v=>`<span class="vu-old">${esc(v.basic)}</span>→<span class="vu-new">${esc(v.better)}</span>`).join(' · ');parts.push(`<div class="cc-sec"><div class="cc-lbl">📈 Vocab</div><div class="cc-val">${vl}</div></div>`);}
+    if(r.style_feedback) parts.push(`<div class="cc-sec"><div class="cc-lbl">✍ Style</div><div class="cc-val" style="color:var(--muted)">${esc(r.style_feedback)}</div></div>`);
+    if(r.pronunciation_tip) parts.push(`<div class="cc-sec"><div class="cc-lbl">🔊 Pronunciation</div><div class="cc-val" style="color:var(--yellow)">${esc(r.pronunciation_tip)}</div></div>`);
+    if(parts.length) corrHtml=`<div class="cm-corr">${parts.join('')}</div>`;
+  }
+  let wpmHtml='';
+  if(role==='user'&&wpm>0){const cl=wpm<20?'slow':wpm<40?'mid':'fast';const fw=Math.min(100,(wpm/80)*100);const bc=wpm<20?'var(--red)':wpm<40?'var(--yellow)':'var(--green)';const lab=wpm<20?'Slow':wpm<40?'Average':'Fast';wpmHtml=`<div class="spd-bar-wrap"><div class="spd-bar-track"><div class="spd-bar-fill" style="width:${fw}%;background:${bc}"></div></div></div><div class="cm-meta"><span class="wpm-tag">${wpm} WPM · ${lab}</span></div>`;}
+  d.innerHTML=`<div class="cm-av">${role==='ai'?'🤖':'👤'}</div><div class="cm-body"><div class="cm-bub">${esc(text)}</div>${corrHtml}${wpmHtml}</div>`;
+  c.appendChild(d);c.scrollTop=c.scrollHeight;
+}
+function showTyping(){const c=document.getElementById('chatMsgs'),d=document.createElement('div');d.className='cm ai';d.id='typInd';d.innerHTML=`<div class="cm-av">🤖</div><div class="typing-ind"><div class="td"></div><div class="td"></div><div class="td"></div></div>`;c.appendChild(d);c.scrollTop=c.scrollHeight;}
+function hideTyping(){const e=document.getElementById('typInd');if(e)e.remove();}
+function updateSpdDisplay(w){const e=document.getElementById('spdVal');if(!w){e.textContent='— WPM';e.className='spd-val';return;}const cl=w<20?'slow':w<40?'mid':'fast';e.textContent=w+' WPM';e.className='spd-val '+cl;}
+
+// SCORES & STATS
+function updateScores(sc){if(!sc)return;[['g',sc.grammar],['v',sc.vocabulary],['f',sc.fluency],['s',sc.style],['p',sc.pronunciation]].forEach(([k,v])=>{if(v==null)return;document.getElementById('sb-'+k).style.width=v+'%';document.getElementById('sv-'+k).textContent=v;document.getElementById('sv-'+k).style.color=v>=80?'var(--green)':v>=60?'var(--yellow)':'var(--red)';});}
+function updateStats(r){stats.turns++;if(r.scores){const a=Math.round((r.scores.grammar+r.scores.vocabulary+r.scores.fluency+r.scores.style+r.scores.pronunciation)/5);stats.score=stats.score?Math.round((stats.score+a)/2):a;}if(r.errors?.length)stats.errors+=r.errors.length;document.getElementById('stTurns').textContent=stats.turns;document.getElementById('stScore').textContent=stats.score||'—';document.getElementById('stErr').textContent=stats.errors;document.getElementById('levelBadge').textContent=stats.score>=85?'ADVANCED':stats.score>=65?'INTERMEDIATE':'BEGINNER';}
+function addWord(nw){if(learnedWords.find(v=>v.word===nw.word))return;learnedWords.push(nw);stats.vocab=learnedWords.length;document.getElementById('stVoc').textContent=stats.vocab;const el=document.getElementById('vocabList');if(learnedWords.length===1)el.innerHTML='';const d=document.createElement('div');d.className='vl-i';d.innerHTML=`<span class="vl-w">${esc(nw.word)}</span><span class="vl-d">${esc(nw.definition)}</span>`;el.appendChild(d);}
+function setTopic(btn,t){topic=t;document.querySelectorAll('.t-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');if(mode==='chat')document.getElementById('chatTopicLabel').textContent=t+' Practice';}
+function resetAll(){spkHistory=[];chatHistory=[];stats={turns:0,score:0,errors:0,vocab:0};learnedWords=[];['stTurns','stErr','stVoc'].forEach(i=>document.getElementById(i).textContent='0');document.getElementById('stScore').textContent='—';document.getElementById('vocabList').innerHTML='<div style="font-size:11px;color:var(--muted);font-style:italic">New words appear as you practice...</div>';document.getElementById('levelBadge').textContent='BEGINNER';document.getElementById('spdVal').textContent='— WPM';clearSpeak();recognition=null;document.getElementById('chatMsgs').innerHTML='';if(mode==='chat')initChat();['g','v','f','s','p'].forEach(k=>{document.getElementById('sb-'+k).style.width='0%';document.getElementById('sv-'+k).textContent='—';});}
+
+// TTS
+function speakTTS(text){if(!text||!window.speechSynthesis)return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='en-US';u.rate=.9;const vs=window.speechSynthesis.getVoices();const en=vs.find(v=>v.lang.startsWith('en')&&v.name.includes('Female'))||vs.find(v=>v.lang.startsWith('en'));if(en)u.voice=en;window.speechSynthesis.speak(u);}
+
+// UTILS
+function esc(t){if(!t)return'';return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
+
+// INIT — default to OpenRouter (works on GitHub Pages, no CORS issues)
+selectAPI('openrouter');
+window.speechSynthesis&&window.speechSynthesis.getVoices();
+</script>
+</body>
+</html>
